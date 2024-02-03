@@ -6,7 +6,6 @@ import com.socialnetwork.boardrift.util.event.OnRegistrationCompleteEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,6 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     @Value("${application.domain}")
     private String applicationDomain;
     private final UserService userService;
-    private final MessageSource messages;
     private final JavaMailSender mailSender;
 
     @Override

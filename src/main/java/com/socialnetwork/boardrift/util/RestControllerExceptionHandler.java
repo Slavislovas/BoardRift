@@ -1,8 +1,8 @@
 package com.socialnetwork.boardrift.util;
 
+import com.socialnetwork.boardrift.util.exception.FieldValidationException;
 import com.socialnetwork.boardrift.util.exception.EmailVerificationTokenExpiredException;
 import com.socialnetwork.boardrift.util.exception.EmailVerificationTokenNotFoundException;
-import com.socialnetwork.boardrift.util.exception.FieldValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
