@@ -1,7 +1,7 @@
 package com.socialnetwork.boardrift.util.listener;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
-import com.socialnetwork.boardrift.service.UserService;
+import com.socialnetwork.boardrift.service.EmailService;
 import com.socialnetwork.boardrift.util.event.OnRegistrationCompleteEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import java.util.UUID;
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
     @Value("${application.domain}")
     private String applicationDomain;
-    private final UserService userService;
+    private final EmailService emailService;
     private final JavaMailSender mailSender;
 
     @Override
@@ -28,7 +28,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         UserEntity userEntity = event.getUserEntity();
         String token = UUID.randomUUID().toString();
-        userService.createEmailVerificationToken(userEntity, token);
+        emailService.createEmailVerificationToken(userEntity, token);
 
         String recipientEmailAddress = userEntity.getEmail();
         String subject = "Board Rift Registration Confirmation";

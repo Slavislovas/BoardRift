@@ -1,7 +1,6 @@
 package com.socialnetwork.boardrift.repository.model.board_game;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
-import com.socialnetwork.boardrift.repository.model.board_game.BoardGameEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
@@ -43,7 +44,7 @@ public class UserControllerUnitTests {
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Username", "Password@123", true, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, Collections.EMPTY_SET,
+                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_SET, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_SET);
 
@@ -57,9 +58,9 @@ public class UserControllerUnitTests {
 
     @Test
     void createUserShouldPassWhenRequestBodyValid() {
-        Mockito.when(userService.createUser(any())).thenReturn(userRetrievalDto);
+        Mockito.when(userService.createUser(any(), any())).thenReturn(userRetrievalDto);
 
-        ResponseEntity<UserRetrievalDto> result = userController.createUser(userRegistrationDto, new MapBindingResult(Collections.EMPTY_MAP, "userRegistrationDto"));
+        ResponseEntity<UserRetrievalDto> result = userController.createUser(userRegistrationDto, new MapBindingResult(Collections.EMPTY_MAP, "userRegistrationDto"), new MockHttpServletRequest());
         Assertions.assertEquals(HttpStatus.CREATED, result.getStatusCode());
         Assertions.assertEquals(userRetrievalDto, result.getBody());
     }
@@ -69,6 +70,6 @@ public class UserControllerUnitTests {
         BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "userRegistrationDto");
         bindingResult.addError(new FieldError("fieldError", "name", "Name is invalid"));
 
-        Assertions.assertThrows(FieldValidationException.class, () -> userController.createUser(userRegistrationDto, bindingResult));
+        Assertions.assertThrows(FieldValidationException.class, () -> userController.createUser(userRegistrationDto, bindingResult, new MockHttpServletRequest()));
     }
 }

@@ -6,6 +6,7 @@ import com.socialnetwork.boardrift.repository.UserRepository;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
+import com.socialnetwork.boardrift.service.EmailService;
 import com.socialnetwork.boardrift.service.UserService;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
 import com.socialnetwork.boardrift.util.mapper.UserMapper;
@@ -17,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Collections;
@@ -35,6 +37,9 @@ public class UserServiceUnitTests {
     @Mock
     UserMapper userMapper;
 
+    @Mock
+    EmailService emailService;
+
     @InjectMocks
     UserService userService;
 
@@ -46,7 +51,7 @@ public class UserServiceUnitTests {
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Username", "Password@123", true, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, Collections.EMPTY_SET,
+                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_SET, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_SET);
 
@@ -66,8 +71,9 @@ public class UserServiceUnitTests {
         Mockito.when(userRepository.save(any())).thenReturn(userEntity);
         Mockito.when(userMapper.entityToRetrievalDto(any())).thenReturn(userRetrievalDto);
         Mockito.when(passwordEncoder.encode(any())).thenReturn("encodedPassword");
+        Mockito.when(emailService.sendEmailVerification(any(), any())).thenReturn(true);
 
-        UserRetrievalDto result = userService.createUser(userRegistrationDto);
+        UserRetrievalDto result = userService.createUser(userRegistrationDto, null);
 
         Assertions.assertEquals(userRetrievalDto, result);
     }
@@ -77,7 +83,7 @@ public class UserServiceUnitTests {
         Mockito.when(userRepository.findByUsername(any())).thenReturn(Optional.of(userEntity));
         Mockito.when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(FieldValidationException.class, () -> userService.createUser(userRegistrationDto));
+        Assertions.assertThrows(FieldValidationException.class, () -> userService.createUser(userRegistrationDto, new MockHttpServletRequest()));
     }
 
     @Test
@@ -85,7 +91,7 @@ public class UserServiceUnitTests {
         Mockito.when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
         Mockito.when(userRepository.findByEmail(any())).thenReturn(Optional.of(userEntity));
 
-        Assertions.assertThrows(FieldValidationException.class, () -> userService.createUser(userRegistrationDto));
+        Assertions.assertThrows(FieldValidationException.class, () -> userService.createUser(userRegistrationDto, new MockHttpServletRequest()));
     }
 
     @Test
@@ -93,6 +99,6 @@ public class UserServiceUnitTests {
         Mockito.when(userRepository.findByUsername(any())).thenReturn(Optional.of(userEntity));
         Mockito.when(userRepository.findByEmail(any())).thenReturn(Optional.of(userEntity));
 
-        Assertions.assertThrows(FieldValidationException.class, () -> userService.createUser(userRegistrationDto));
+        Assertions.assertThrows(FieldValidationException.class, () -> userService.createUser(userRegistrationDto, new MockHttpServletRequest()));
     }
 }
