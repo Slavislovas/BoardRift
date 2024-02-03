@@ -15,12 +15,15 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class UserEntity {
@@ -39,7 +42,7 @@ public class UserEntity {
     private String email;
 
     @Column(name = "dateOfBirth")
-    private LocalDate dateOfBirth;
+    private String dateOfBirth;
 
     @Column(name = "username")
     private String username;
@@ -48,19 +51,19 @@ public class UserEntity {
     private String password;
 
     @Column(name = "publicProfile")
-    private Boolean publicProfile;
+    private Boolean publicProfile = true;
 
     @Column(name = "publicFriendsList")
-    private Boolean publicFriendsList;
+    private Boolean publicFriendsList = false;
 
     @Column(name = "profilePictureUrl")
-    private String profilePictureUrl;
+    private String profilePictureUrl = "";
 
     @Column(name = "role")
-    private Role role;
+    private Role role = Role.ROLE_USER;
 
     @Column(name = "status")
-    private UserStatus status;
+    private UserStatus status = UserStatus.OFFLINE;
 
     @ManyToMany
     @JoinTable(
