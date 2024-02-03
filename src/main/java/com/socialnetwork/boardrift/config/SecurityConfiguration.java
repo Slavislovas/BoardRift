@@ -22,6 +22,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
                     authorizationManagerRequestMatcherRegistry
                             .requestMatchers(HttpMethod.POST, "**/users/register").permitAll()
+                            .requestMatchers(HttpMethod.GET, "**/users/register/confirm**").permitAll()
                             .requestMatchers("/error").permitAll()
                             .anyRequest()
                             .authenticated();

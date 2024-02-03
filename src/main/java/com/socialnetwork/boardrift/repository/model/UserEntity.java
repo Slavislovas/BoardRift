@@ -65,6 +65,9 @@ public class UserEntity {
     @Column(name = "status")
     private UserStatus status = UserStatus.OFFLINE;
 
+    @Column(name = "email-verified")
+    private Boolean emailVerified = false;
+
     @ManyToMany
     @JoinTable(
             name = "friends",
