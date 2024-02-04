@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -26,9 +27,9 @@ public class RefreshTokenEntity {
     private String token;
 
     @Column(name = "expiration-date")
-    private Instant expirationDate;
+    private Date expirationDate;
 
     @OneToOne
     @JoinColumn(name = "id_user")
-    private UserEntity userEntity;
+    private UserEntity user;
 }

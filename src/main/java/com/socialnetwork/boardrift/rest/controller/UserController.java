@@ -1,5 +1,6 @@
 package com.socialnetwork.boardrift.rest.controller;
 
+import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
 import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
 import com.socialnetwork.boardrift.service.UserService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,5 +35,10 @@ public class UserController {
     public ResponseEntity<UserRetrievalDto> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto, BindingResult bindingResult, HttpServletRequest servletRequest) {
         RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(userService.createUser(userRegistrationDto, servletRequest), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{receiverId}/friend-request/send")
+    public ResponseEntity<FriendRequestDto> sendFriendRequest(@PathVariable("receiverId") Long receiverId) {
+        return new ResponseEntity<>(userService.sendFriendRequest(receiverId), HttpStatus.CREATED);
     }
 }
