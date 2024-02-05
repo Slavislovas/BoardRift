@@ -100,10 +100,17 @@ public class UserService {
     }
 
     private boolean receiverAlreadyFriend(UserEntity senderUserEntity, Long receiverId) {
-        return senderUserEntity
+        boolean hasFriend =  senderUserEntity
                 .getFriends()
                 .stream()
                 .anyMatch(friend -> friend.getId().equals(receiverId));
+
+        boolean friendOf = senderUserEntity
+                .getFriendOf()
+                .stream()
+                .anyMatch(friend -> friend.getId().equals(receiverId));
+
+        return hasFriend || friendOf;
     }
 
     private boolean receiverAlreadySentFriendRequest(UserEntity senderUserEntity, Long receiverId) {
@@ -182,7 +189,7 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userDetails.getUsername() + " was not found"));
 
         if (!Role.ROLE_ADMINISTRATOR.name().equals(role)) {
             if (!userEntity.getUsername().equals(userDetails.getUsername())) {

@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,11 +26,6 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponseDto> authenticate(@Valid @RequestBody AuthenticationRequestDto authenticationRequestDto, BindingResult bindingResult) {
         RequestValidator.validateRequest(bindingResult);
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequestDto));
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("success");
     }
 
     @PostMapping("/refresh-token")
