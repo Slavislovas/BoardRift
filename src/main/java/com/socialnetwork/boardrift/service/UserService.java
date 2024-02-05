@@ -1,11 +1,13 @@
 package com.socialnetwork.boardrift.service;
 
+import com.socialnetwork.boardrift.enumeration.Role;
 import com.socialnetwork.boardrift.repository.UserRepository;
 import com.socialnetwork.boardrift.repository.model.EmailVerificationTokenEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
 import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.util.exception.DuplicateFriendRequestException;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
 import com.socialnetwork.boardrift.util.mapper.UserMapper;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -74,7 +78,7 @@ public class UserService {
         senderUserEntity.addSentFriendRequest(receiverUserEntity);
         userRepository.save(senderUserEntity);
 
-        return new FriendRequestDto(userMapper.entityToRetrievalDto(senderUserEntity), userMapper.entityToRetrievalDto(receiverUserEntity));
+        return new FriendRequestDto(userMapper.entityToMinimalRetrievalDto(senderUserEntity), userMapper.entityToMinimalRetrievalDto(receiverUserEntity));
     }
 
     private void validateFriendRequest(Long receiverId, UserEntity senderUserEntity) {
@@ -114,5 +118,90 @@ public class UserService {
                 .getSentFriendInvites()
                 .stream()
                 .anyMatch(userEntity -> userEntity.getId().equals(receiverId));
+    }
+
+    public UserRetrievalMinimalDto acceptFriendRequest(Long senderId) {
+        UserDetails receiverUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity receiverUserEntity = userRepository.findByUsername(receiverUserDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + receiverUserDetails.getUsername() + " was not found"));
+
+        if (senderHasNotSentFriendRequest(receiverUserEntity, senderId)) {
+            throw new EntityNotFoundException("Friend request from user with id: " + senderId + " not found");
+        }
+
+        UserEntity senderUserEntity = userRepository.findById(senderId).orElseThrow(() -> new EntityNotFoundException("Friend request sender with id: " + senderId + " was not found"));
+        receiverUserEntity.addFriend(senderUserEntity);
+        receiverUserEntity.removeReceivedFriendRequest(senderUserEntity);
+        userRepository.save(receiverUserEntity);
+
+        return userMapper.entityToMinimalRetrievalDto(senderUserEntity);
+    }
+
+    public String declineFriendRequest(Long senderId) {
+        UserDetails receiverUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity receiverUserEntity = userRepository.findByUsername(receiverUserDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + receiverUserDetails.getUsername() + " was not found"));
+
+        if (senderHasNotSentFriendRequest(receiverUserEntity, senderId)) {
+            throw new EntityNotFoundException("Friend request from user with id: " + senderId + " not found");
+        }
+
+        UserEntity senderUserEntity = userRepository.findById(senderId).orElseThrow(() -> new EntityNotFoundException("Friend request sender with id: " + senderId + " was not found"));
+        receiverUserEntity.removeReceivedFriendRequest(senderUserEntity);
+        userRepository.save(receiverUserEntity);
+
+        return "Friend request declined successfully";
+    }
+
+    private boolean senderHasNotSentFriendRequest(UserEntity receiverUserEntity, Long senderId) {
+        return receiverUserEntity
+                .getReceivedFriendInvites()
+                .stream()
+                .noneMatch(userEntity -> userEntity.getId().equals(senderId));
+    }
+
+    public Set<UserRetrievalMinimalDto> getReceivedFriendRequests() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity userEntity = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+
+        return userEntity.getReceivedFriendInvites()
+                .stream()
+                .map(userMapper::entityToMinimalRetrievalDto)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<UserRetrievalMinimalDto> getSentFriendRequests() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity userEntity = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+
+        return userEntity.getSentFriendInvites()
+                .stream()
+                .map(userMapper::entityToMinimalRetrievalDto)
+                .collect(Collectors.toSet());
+    }
+
+    public Set<UserRetrievalMinimalDto> getFriends(Long userId) throws IllegalAccessException {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+
+        if (!Role.ROLE_ADMINISTRATOR.name().equals(role)) {
+            if (!userEntity.getUsername().equals(userDetails.getUsername())) {
+                if (!userEntity.getPublicFriendsList()) {
+                    throw new IllegalAccessException("You cannot view this user's friend list");
+                }
+            }
+        }
+
+        Set<UserRetrievalMinimalDto> friends = userEntity.getFriends()
+                .stream()
+                .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet());
+
+        friends.addAll(
+                userEntity.getFriendOf()
+                        .stream()
+                        .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet())
+        );
+
+        return friends;
     }
 }

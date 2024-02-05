@@ -1,5 +1,7 @@
 package com.socialnetwork.boardrift.config.filter;
 
+import com.socialnetwork.boardrift.repository.UserRepository;
+import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -26,13 +28,14 @@ import java.io.IOException;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             final String authHeader = request.getHeader("Authorization");
             final String jwt;
-            final String username;
+            final String userId;
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);
@@ -40,18 +43,20 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             }
 
             jwt = authHeader.substring(7);
-            username = jwtService.extractUsername(jwt);
+            userId = jwtService.extractId(jwt);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserEntity userEntity = userRepository.findById(Long.parseLong(userId)).orElseThrow();
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userEntity.getUsername());
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
+                if (jwtService.isTokenValid(jwt, userEntity)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
+
             }
-        } catch (ExpiredJwtException | MalformedJwtException | UnsupportedJwtException | SignatureException | IllegalStateException | NullPointerException | DecodingException exception) {
+        } catch (Exception exception) {
             SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request, response);

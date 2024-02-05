@@ -35,7 +35,12 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.POST, "**/auth/login").permitAll()
                             .requestMatchers(HttpMethod.POST, "**/auth/refresh-token").permitAll()
                             .requestMatchers("/error").permitAll()
-                            .requestMatchers(HttpMethod.POST, "**/users/**/friend-request/send").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.POST, "**/users/**/friend-requests/send").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.POST, "**/users/**/friend-requests/accept").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.DELETE, "**/users/**/friend-requests/decline").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.GET, "**/users/friend-requests/sent").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.GET, "**/users/friend-requests/received").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.GET, "**/users/friends").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .anyRequest()
                             .authenticated();
                 })

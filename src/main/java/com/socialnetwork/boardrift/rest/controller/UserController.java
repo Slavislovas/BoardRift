@@ -3,6 +3,7 @@ package com.socialnetwork.boardrift.rest.controller;
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
 import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.service.UserService;
 import com.socialnetwork.boardrift.util.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Set;
 
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -31,14 +35,39 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/friend-requests/received")
+    public ResponseEntity<Set<UserRetrievalMinimalDto>> getReceivedFriendRequests() {
+        return ResponseEntity.ok(userService.getReceivedFriendRequests());
+    }
+
+    @GetMapping("/friend-requests/sent")
+    public ResponseEntity<Set<UserRetrievalMinimalDto>> getSentFriendRequests() {
+        return ResponseEntity.ok(userService.getSentFriendRequests());
+    }
+
+    @GetMapping("/{userId}/friends")
+    public ResponseEntity<Set<UserRetrievalMinimalDto>> getFriends(@PathVariable("userId") Long userId) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.getFriends(userId));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<UserRetrievalDto> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto, BindingResult bindingResult, HttpServletRequest servletRequest) {
         RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(userService.createUser(userRegistrationDto, servletRequest), HttpStatus.CREATED);
     }
 
-    @PostMapping("/{receiverId}/friend-request/send")
+    @PostMapping("/{receiverId}/friend-requests/send")
     public ResponseEntity<FriendRequestDto> sendFriendRequest(@PathVariable("receiverId") Long receiverId) {
         return new ResponseEntity<>(userService.sendFriendRequest(receiverId), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{senderId}/friend-requests/accept")
+    public ResponseEntity<UserRetrievalMinimalDto> acceptFriendRequest(@PathVariable("senderId") Long senderId) {
+        return ResponseEntity.ok(userService.acceptFriendRequest(senderId));
+    }
+
+    @DeleteMapping("/{senderId}/friend-requests/decline")
+    public ResponseEntity<String> declineFriendRequest(@PathVariable("senderId") Long senderId) {
+        return ResponseEntity.ok(userService.declineFriendRequest(senderId));
     }
 }

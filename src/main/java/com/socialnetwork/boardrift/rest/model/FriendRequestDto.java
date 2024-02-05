@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FriendRequestDto {
-    private UserRetrievalDto sender;
-    private UserRetrievalDto receiver;
+    private UserRetrievalMinimalDto sender;
+    private UserRetrievalMinimalDto receiver;
 }

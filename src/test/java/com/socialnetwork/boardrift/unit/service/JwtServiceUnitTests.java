@@ -63,7 +63,7 @@ public class JwtServiceUnitTests {
                             .parseClaimsJws(token)
                             .getBody();
         Assertions.assertEquals(userEntity.getRole().name(), claims.get("role"));
-        Assertions.assertEquals(userEntity.getUsername(), claims.getSubject());
+        Assertions.assertEquals(userEntity.getId().toString(), claims.getSubject());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class JwtServiceUnitTests {
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
 
-        String username = jwtService.extractUsername(token);
+        String username = jwtService.extractId(token);
 
         Assertions.assertEquals(userEntity.getUsername(), username);
     }
@@ -123,14 +123,14 @@ public class JwtServiceUnitTests {
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
 
-        Assertions.assertThrows(Exception.class, () -> jwtService.extractUsername(token));
+        Assertions.assertThrows(Exception.class, () -> jwtService.extractId(token));
     }
 
     @Test
     void isTokenValidShouldReturnTrueWhenJwtValid() {
         String token = Jwts
                 .builder()
-                .setSubject(userEntity.getUsername())
+                .setSubject(userEntity.getId().toString())
                 .claim("role", userEntity.getRole())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 500000))

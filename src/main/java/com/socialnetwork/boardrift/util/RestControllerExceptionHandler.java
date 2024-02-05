@@ -69,4 +69,9 @@ public class RestControllerExceptionHandler {
     public ResponseEntity<String> handleDuplicateFriendRequestException(DuplicateFriendRequestException exception, HttpServletRequest request) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(IllegalAccessException.class)
+    public ResponseEntity<String> handleIllegalAccessException(IllegalAccessException exception, HttpServletRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    }
 }

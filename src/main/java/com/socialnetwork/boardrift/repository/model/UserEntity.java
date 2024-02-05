@@ -105,12 +105,6 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "reviewCreator")
     private Set<BoardGameReviewEntity> createdBoardGameReviews;
 
-//    @OneToMany(mappedBy = "sender")
-//    private Set<FriendInviteEntity> sentFriendInvites;
-//
-//    @OneToMany(mappedBy = "receiver")
-//    private Set<FriendInviteEntity> receivedFriendInvites;
-
     @ManyToMany
     @JoinTable(
             name = "friend-invites",
@@ -169,5 +163,13 @@ public class UserEntity implements UserDetails {
 
     public void addReceivedFriendRequest(UserEntity sender) {
         receivedFriendInvites.add(sender);
+    }
+
+    public void addFriend(UserEntity sender) {
+        friends.add(sender);
+    }
+
+    public void removeReceivedFriendRequest(UserEntity senderUserEntity) {
+        receivedFriendInvites.remove(senderUserEntity);
     }
 }
