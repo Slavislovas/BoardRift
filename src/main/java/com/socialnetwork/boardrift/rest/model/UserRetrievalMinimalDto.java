@@ -1,5 +1,6 @@
 package com.socialnetwork.boardrift.rest.model;
 
+import com.socialnetwork.boardrift.enumeration.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,4 +14,5 @@ public class UserRetrievalMinimalDto {
     private String lastname;
     private String dateOfBirth;
     private String profilePictureUrl;
+    private UserStatus status;
 }

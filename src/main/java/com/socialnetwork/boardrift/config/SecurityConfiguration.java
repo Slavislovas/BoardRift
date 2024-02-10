@@ -25,6 +25,7 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -41,6 +42,7 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.GET, "**/users/friend-requests/sent").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .requestMatchers(HttpMethod.GET, "**/users/friend-requests/received").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .requestMatchers(HttpMethod.GET, "**/users/friends").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.GET, "**/messages/**/**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .anyRequest()
                             .authenticated();
                 })
