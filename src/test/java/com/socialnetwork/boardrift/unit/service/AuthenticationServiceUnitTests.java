@@ -61,8 +61,7 @@ public class AuthenticationServiceUnitTests {
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Username", "Password@123", true, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
-                Collections.EMPTY_SET, Collections.EMPTY_SET, Collections.EMPTY_SET,
-                Collections.EMPTY_SET, Collections.EMPTY_SET);
+                Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET);
         refreshTokenEntity = new RefreshTokenEntity("refreshToken", new Date(), userEntity);
     }
 

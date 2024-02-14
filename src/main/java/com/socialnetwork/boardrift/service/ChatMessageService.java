@@ -4,13 +4,11 @@ import com.socialnetwork.boardrift.repository.ChatMessageRepository;
 import com.socialnetwork.boardrift.repository.model.ChatMessageEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.rest.model.ChatMessageDto;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -25,13 +23,6 @@ public class ChatMessageService {
     private final UserService userService;
 
     public ChatMessageDto saveChatMessage(ChatMessageDto chatMessageDto) throws IllegalAccessException {
-//        UserDetails senderUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        UserEntity senderUserEntity = userService.getUserEntityByUsername(senderUserDetails.getUsername());
-//
-//        if (tryingToSendMessageToNonFriend(chatMessageDto, senderUserEntity)) {
-//            throw new IllegalAccessException("You cannot send a message to a user who is not your friend");
-//        }
-
         String chatId = chatRoomService.getChatRoomId(chatMessageDto.getSenderId(), chatMessageDto.getRecipientId(), true).orElseThrow();
 
         UserEntity senderEntity = userService.getUserEntityById(chatMessageDto.getSenderId());

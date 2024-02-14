@@ -1,6 +1,7 @@
 package com.socialnetwork.boardrift.repository.model.board_game;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.played_game_post.PlayedGamePostEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,36 +11,30 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.Instant;
-
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "board-game-reviews")
-public class BoardGameReviewEntity {
+@Table(name = "played-games")
+public class PlayedGameEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_board-game-review")
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "rating")
-    private Double rating;
+    @Column(name = "id_bgg_game")
+    private Long bggGameId;
 
-    @Column(name = "description")
-    private String description;
+    private Integer score;
 
-    @Column(name = "creation-date")
-    private Instant creationDate;
+    private Integer place;
 
     @ManyToOne
-    @JoinColumn(name = "id_review-creator")
-    private UserEntity reviewCreator;
-
-    @ManyToOne
-    @JoinColumn(name = "id_reviewed-board-game")
-    private BoardGameEntity boardGame;
+    @JoinColumn(name = "id_user")
+    private UserEntity userEntity;
 }

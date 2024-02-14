@@ -34,6 +34,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithSecurityContext;
 import org.springframework.security.test.context.support.WithUserDetails;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -74,14 +75,12 @@ public class UserServiceUnitTests {
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Username", "Password@123", true, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false,  new HashSet<>(),
-                new HashSet<>(),  new HashSet<>(),  new HashSet<>(),
-                new HashSet<>(),  new HashSet<>());
+                new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>());
 
         userEntity2 = new UserEntity(2L, "Name2", "Lastname2", "email2@gmail.com",
                 "2001-11-16", "Username2", "Password@123", true, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false,  new HashSet<>(),
-                new HashSet<>(),  new HashSet<>(),  new HashSet<>(),
-                new HashSet<>(),  new HashSet<>());
+                new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>());
 
         userRegistrationDto = new UserRegistrationDto("Name", "Lastname",
                 "email@gmail.com", "2001-11-16",
@@ -89,9 +88,9 @@ public class UserServiceUnitTests {
 
         userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "");
 
-        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "2001-11-16", "");
+        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
 
-        userRetrievalMinimalDto2 = new UserRetrievalMinimalDto(1L, "Name2", "Lastname2", "2001-11-16", "");
+        userRetrievalMinimalDto2 = new UserRetrievalMinimalDto(1L, "Name2", "Lastname2", "", UserStatus.OFFLINE);
 
         emailVerificationTokenEntity = new EmailVerificationTokenEntity(1L, "token", userEntity, new Date(new Date().getTime() + 5000));
         securityContext.setAuthentication(authentication);
@@ -359,5 +358,31 @@ public class UserServiceUnitTests {
         Mockito.when(userRepository.findById(2L)).thenReturn(Optional.of(userEntity2));
 
         Assertions.assertThrows(IllegalAccessException.class, () -> userService.getFriends(2L));
+    }
+
+    @Test
+    void getUserEntityByIdShouldSucceed() {
+        Mockito.when(userRepository.findById(any())).thenReturn(Optional.of(userEntity));
+        UserEntity result = userService.getUserEntityById(1L);
+        Assertions.assertEquals(userEntity, result);
+    }
+
+    @Test
+    void getUserEntityByIdShouldFail() {
+        Mockito.when(userRepository.findById(any())).thenReturn(Optional.empty());
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserEntityById(1L));
+    }
+
+    @Test
+    void getUserEntityByUsernameShouldSucceed() {
+        Mockito.when(userRepository.findByUsername(any())).thenReturn(Optional.of(userEntity));
+        UserEntity result = userService.getUserEntityByUsername("username");
+        Assertions.assertEquals(userEntity, result);
+    }
+
+    @Test
+    void getUserEntityByUsernameShouldFail() {
+        Mockito.when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserEntityByUsername(""));
     }
 }

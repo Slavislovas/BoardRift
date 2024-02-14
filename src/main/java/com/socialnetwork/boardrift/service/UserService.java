@@ -41,6 +41,10 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User with username: " + username + " was not found"));
     }
 
+    public UserEntity saveUserEntity(UserEntity playerEntity) {
+        return userRepository.save(playerEntity);
+    }
+
     public UserRetrievalDto createUser(UserRegistrationDto userRegistrationDto, HttpServletRequest servletRequest) {
         verifyIfUsernameAndEmailIsUnique(userRegistrationDto.getUsername(), userRegistrationDto.getEmail());
 
@@ -217,6 +221,37 @@ public class UserService {
                         .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet())
         );
 
+        return friends;
+    }
+
+    public Set<UserRetrievalMinimalDto> searchFriendsByName(Long userId, String query) throws IllegalAccessException {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userDetails.getUsername() + " was not found"));
+
+        if (!Role.ROLE_ADMINISTRATOR.name().equals(role)) {
+            if (!userEntity.getUsername().equals(userDetails.getUsername())) {
+                if (!userEntity.getPublicFriendsList()) {
+                    throw new IllegalAccessException("You cannot search this user's friend list");
+                }
+            }
+        }
+
+        if (query == null) {
+            return getFriends(userId);
+        }
+
+        Set<UserRetrievalMinimalDto> friends = userEntity.getFriends()
+                .stream()
+                .filter(friend -> friend.getName().concat(" " + friend.getLastname()).toLowerCase().contains(query.toLowerCase()))
+                .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet());
+
+        friends.addAll(
+                userEntity.getFriendOf()
+                        .stream()
+                        .filter(friend -> friend.getName().concat(" " + friend.getLastname()).toLowerCase().contains(query.toLowerCase()))
+                        .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet()));
         return friends;
     }
 }

@@ -10,6 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
+@Setter
 @Service
 public class JwtService {
     private final RefreshTokenRepository refreshTokenRepository;
@@ -103,10 +105,6 @@ public class JwtService {
 
     public boolean checkIfRefreshTokenExistsByUserId(Long id) {
         return refreshTokenRepository.existsByUserId(id);
-    }
-
-    public String findRefreshTokenByUserId(Long id) {
-        return refreshTokenRepository.findByUserId(id).orElseThrow(RefreshTokenNotFoundException::new).getToken();
     }
 
     public RefreshTokenEntity saveRefreshToken(UserEntity userEntity) {

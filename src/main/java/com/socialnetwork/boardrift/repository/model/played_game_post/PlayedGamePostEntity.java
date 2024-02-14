@@ -1,7 +1,8 @@
 package com.socialnetwork.boardrift.repository.model.played_game_post;
 
-import com.socialnetwork.boardrift.repository.model.board_game.BoardGameEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +18,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -31,17 +34,17 @@ public class PlayedGamePostEntity {
     @Column(name = "id_played-game-post")
     private Long id;
 
-    @Column(name = "title")
-    private String title;
+    @Column(name = "id_bgg-game")
+    private Long bggGameId;
 
     @Column(name = "description")
     private String description;
 
     @Column(name = "creation-date")
-    private Instant creationDate;
+    private Date creationDate;
 
-    @Column(name = "top-score")
-    private Integer topScore;
+    @Column(name = "highest-score")
+    private Integer highestScore;
 
     @Column(name = "lowest-score")
     private Integer lowestScore;
@@ -49,14 +52,17 @@ public class PlayedGamePostEntity {
     @Column(name = "average-score")
     private Double averageScore;
 
-    @Column(name = "time-played")
-    private String timePlayed;
+    @Column(name = "stats-added")
+    private Boolean statsAdded;
+
+    @Column(name = "stats-string")
+    private String statsString;
 
     @ManyToOne
     @JoinColumn(name = "id_post-creator")
     private UserEntity postCreator;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(
             name = "played-game-post-players",
             joinColumns = @JoinColumn(name = "id_user"),
@@ -69,8 +75,4 @@ public class PlayedGamePostEntity {
 
     @OneToMany(mappedBy = "likedPost")
     private Set<PlayedGamePostLikeEntity> likes;
-
-    @ManyToOne
-    @JoinColumn(name = "id_played-game")
-    private BoardGameEntity playedGame;
 }

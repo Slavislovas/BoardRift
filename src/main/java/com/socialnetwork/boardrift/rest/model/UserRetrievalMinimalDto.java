@@ -12,7 +12,6 @@ public class UserRetrievalMinimalDto {
     private Long id;
     private String name;
     private String lastname;
-    private String dateOfBirth;
     private String profilePictureUrl;
     private UserStatus status;
 }

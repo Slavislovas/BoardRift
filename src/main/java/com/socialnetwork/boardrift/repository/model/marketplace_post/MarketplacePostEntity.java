@@ -1,6 +1,5 @@
 package com.socialnetwork.boardrift.repository.model.marketplace_post;
 
-import com.socialnetwork.boardrift.repository.model.board_game.BoardGameEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,8 +50,4 @@ public class MarketplacePostEntity {
 
     @OneToMany(mappedBy = "likedPost")
     private Set<MarketplacePostLikeEntity> likes;
-
-    @ManyToOne
-    @JoinColumn(name = "id_game-on-sale")
-    private BoardGameEntity gameOnSale;
 }

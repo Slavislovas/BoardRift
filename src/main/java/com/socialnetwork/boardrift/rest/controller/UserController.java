@@ -50,6 +50,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getFriends(userId));
     }
 
+    @GetMapping("/{userId}/friends/search")
+    public ResponseEntity<Set<UserRetrievalMinimalDto>> searchFriendsByName(@PathVariable("userId") Long userId, @RequestParam(value = "query", required = false) String query) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.searchFriendsByName(userId, query));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<UserRetrievalDto> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto, BindingResult bindingResult, HttpServletRequest servletRequest) {
         RequestValidator.validateRequest(bindingResult);

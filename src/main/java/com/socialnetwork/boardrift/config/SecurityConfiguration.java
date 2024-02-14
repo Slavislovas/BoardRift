@@ -41,8 +41,10 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.DELETE, "**/users/**/friend-requests/decline").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .requestMatchers(HttpMethod.GET, "**/users/friend-requests/sent").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .requestMatchers(HttpMethod.GET, "**/users/friend-requests/received").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
-                            .requestMatchers(HttpMethod.GET, "**/users/friends").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.GET, "**/users/**/friends").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.GET, "**/users/**/friends/search**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .requestMatchers(HttpMethod.GET, "**/messages/**/**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.POST, "**/posts/played-game**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .anyRequest()
                             .authenticated();
                 })
