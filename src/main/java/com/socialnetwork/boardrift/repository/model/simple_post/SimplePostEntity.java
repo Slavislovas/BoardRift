@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.repository.model.played_game_post;
+package com.socialnetwork.boardrift.repository.model.simple_post;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
@@ -19,29 +19,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "played-game-posts")
-public class PlayedGamePostEntity {
+@Table(name = "simple-posts")
+public class SimplePostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_played-game-post")
+    @Column(name = "id_simple-post")
     private Long id;
-
-    @Column(name = "id_bgg-game")
-    private Long bggGameId;
-
-    @Column(name = "game-name")
-    private String gameName;
-
-    @Column(name = "game-picture-url")
-    private String gamePictureUrl;
 
     @Column(name = "description")
     private String description;
@@ -49,33 +38,13 @@ public class PlayedGamePostEntity {
     @Column(name = "creation-date")
     private Date creationDate;
 
-    @Column(name = "highest-score")
-    private Integer highestScore;
-
-    @Column(name = "lowest-score")
-    private Integer lowestScore;
-
-    @Column(name = "average-score")
-    private Double averageScore;
-
-    @Column(name = "scoring-system")
-    private String scoringSystem;
-
     @ManyToOne
     @JoinColumn(name = "id_post-creator")
     private UserEntity postCreator;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST})
-    @JoinTable(
-            name = "posted-plays",
-            joinColumns = @JoinColumn(name = "id_played-game-post"),
-            inverseJoinColumns = @JoinColumn(name = "id_posted-play")
-    )
-    private Set<PlayedGameEntity> plays;
-
     @OneToMany(mappedBy = "commentedPost")
-    private Set<PlayedGamePostCommentEntity> comments;
+    private Set<SimplePostCommentEntity> comments;
 
     @OneToMany(mappedBy = "likedPost")
-    private Set<PlayedGamePostLikeEntity> likes;
+    private Set<SimplePostLikeEntity> likes;
 }

@@ -3,7 +3,7 @@ package com.socialnetwork.boardrift.unit.controller;
 import com.socialnetwork.boardrift.enumeration.UserStatus;
 import com.socialnetwork.boardrift.rest.controller.PostController;
 import com.socialnetwork.boardrift.rest.model.BoardGameDto;
-import com.socialnetwork.boardrift.rest.model.PlayedGamePostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.played_game_post.PlayedGamePostRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.service.PostService;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +21,6 @@ import org.springframework.validation.MapBindingResult;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -42,7 +41,7 @@ public class PostControllerUnitTests {
     void init() {
         boardGameDto = new BoardGameDto();
         userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
-        playedGamePostRetrievalDto = new PlayedGamePostRetrievalDto(1L, 2L, "Description", Instant.now(), 500, 300, 1.20, false, "", userRetrievalMinimalDto, new HashSet<>(), new HashSet<>(), 0);
+        playedGamePostRetrievalDto = new PlayedGamePostRetrievalDto(1L, 2L, "gameName", "gamePicture", "Description", "no-score", Instant.now(), 500, 300, 1.20, userRetrievalMinimalDto, new HashSet<>(), new HashSet<>(), 0, null);
     }
 
     @Test

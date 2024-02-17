@@ -45,6 +45,8 @@ public class SecurityConfiguration {
                             .requestMatchers(HttpMethod.GET, "**/users/**/friends/search**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .requestMatchers(HttpMethod.GET, "**/messages/**/**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .requestMatchers(HttpMethod.POST, "**/posts/played-game**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.POST, "**/posts/simple**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
+                            .requestMatchers(HttpMethod.POST, "**/posts/poll**").hasAnyRole("USER", "CONTENT_CURATOR", "ADMINISTRATOR")
                             .anyRequest()
                             .authenticated();
                 })

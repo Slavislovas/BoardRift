@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model;
+package com.socialnetwork.boardrift.rest.model.played_game_post;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,9 +12,9 @@ import java.util.Set;
 public class PlayedGamePostCreationDto {
    private Long playedGameId;
    private String description;
-   private Integer postCreatorPlace;
+   private Boolean postCreatorWon;
    private Integer postCreatorPoints;
-   private Boolean statsAdded;
+   private String scoringSystem;
    private Set<SelectedPlayerDto> players;
 
     public void addPlayer(SelectedPlayerDto selectedPlayerDto) {
@@ -28,7 +28,7 @@ public class PlayedGamePostCreationDto {
        private Long id;
        private String name;
        private String lastname;
-       private Integer place;
+       private Boolean won;
        private Integer points;
    }
 }

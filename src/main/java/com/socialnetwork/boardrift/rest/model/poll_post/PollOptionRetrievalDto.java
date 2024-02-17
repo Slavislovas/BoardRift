@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model;
+package com.socialnetwork.boardrift.rest.model.poll_post;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlayedGamePostCommentDto {
+public class PollOptionRetrievalDto {
     private Long id;
     private String text;
-    private String creationDate;
-    private UserRetrievalMinimalDto commentCreator;
+    private Integer votes;
 }

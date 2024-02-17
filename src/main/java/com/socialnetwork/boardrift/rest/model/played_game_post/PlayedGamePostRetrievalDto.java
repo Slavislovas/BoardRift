@@ -1,5 +1,7 @@
-package com.socialnetwork.boardrift.rest.model;
+package com.socialnetwork.boardrift.rest.model.played_game_post;
 
+import com.socialnetwork.boardrift.rest.model.PostCommentDto;
+import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,15 +15,17 @@ import java.util.Set;
 public class PlayedGamePostRetrievalDto {
     private Long id;
     private Long bggGameId;
+    private String gameName;
+    private String gamePictureUrl;
     private String description;
+    private String scoringSystem;
     private Instant creationDate;
-    private Integer topScore;
+    private Integer highestScore;
     private Integer lowestScore;
     private Double averageScore;
-    private Boolean statsAdded;
-    private String stats;
     private UserRetrievalMinimalDto postCreator;
-    private Set<UserRetrievalMinimalDto> players;
-    private Set<PlayedGamePostCommentDto> comments;
+    private Set<PlayedGameDto> plays;
+    private Set<PostCommentDto> comments;
     private Integer likes;
+    private String type = "played-game";
 }

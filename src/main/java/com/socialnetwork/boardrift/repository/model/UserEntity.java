@@ -91,7 +91,7 @@ public class UserEntity implements UserDetails {
     )
     private Set<UserEntity> friendOf;
 
-    @OneToMany(mappedBy = "userEntity", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
     private List<PlayedGameEntity> playedGames;
 
     @ManyToMany

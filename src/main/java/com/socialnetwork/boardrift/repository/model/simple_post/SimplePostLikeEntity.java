@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.repository.model.board_game;
+package com.socialnetwork.boardrift.repository.model.simple_post;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import jakarta.persistence.Column;
@@ -10,35 +10,25 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "played-games")
-public class PlayedGameEntity {
+@Table(name = "played-game-post-likes")
+public class SimplePostLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id_played-game-post-like")
     private Long id;
 
-    @Column(name = "id_bgg_game")
-    private Long bggGameId;
-
-    @Column(name = "score")
-    private Integer score;
-
-    @Column(name = "won")
-    private Boolean won;
-
-    @Column(name = "scoring-system")
-    private String scoringSystem;
+    @ManyToOne
+    @JoinColumn(name = "id_like-owner")
+    private UserEntity likeOwner;
 
     @ManyToOne
-    @JoinColumn(name = "id_user")
-    private UserEntity user;
+    @JoinColumn(name = "id_liked-post")
+    private SimplePostEntity likedPost;
 }
