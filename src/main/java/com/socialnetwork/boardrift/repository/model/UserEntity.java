@@ -24,7 +24,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 @Getter
@@ -74,6 +76,9 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "email-verified")
     private Boolean emailVerified = false;
+
+    @Column(name = "feed-queue")
+    private PriorityQueue<String> feedQueue;
 
     @ManyToMany
     @JoinTable(
@@ -157,11 +162,21 @@ public class UserEntity implements UserDetails {
         friends.add(sender);
     }
 
+    public Set<UserEntity> getFriends() {
+        Set<UserEntity> friends = new HashSet<>(this.friends);
+        friends.addAll(this.friendOf);
+        return friends;
+    }
+
     public void removeReceivedFriendRequest(UserEntity senderUserEntity) {
         receivedFriendInvites.remove(senderUserEntity);
     }
 
     public void addPlayedGame(PlayedGameEntity playedGame) {
         playedGames.add(playedGame);
+    }
+
+    public void addPostToFeedQueue(String postType, Long id) {
+        feedQueue.add(String.format("%s %d", postType, id));
     }
 }

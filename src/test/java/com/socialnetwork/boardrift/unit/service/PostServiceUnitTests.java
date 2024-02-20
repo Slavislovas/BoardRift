@@ -4,6 +4,7 @@ import com.socialnetwork.boardrift.repository.PlayedGamePostRepository;
 import com.socialnetwork.boardrift.repository.PlayedGameRepository;
 import com.socialnetwork.boardrift.repository.PollPostRepository;
 import com.socialnetwork.boardrift.repository.PostCommentRepository;
+import com.socialnetwork.boardrift.repository.PostLikeRepository;
 import com.socialnetwork.boardrift.repository.SimplePostRepository;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.repository.model.post.PlayedGamePostEntity;
@@ -11,6 +12,7 @@ import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.post.PollOptionEntity;
 import com.socialnetwork.boardrift.repository.model.post.PollOptionVoteEntity;
 import com.socialnetwork.boardrift.repository.model.post.PollPostEntity;
+import com.socialnetwork.boardrift.repository.model.post.PostLikeEntity;
 import com.socialnetwork.boardrift.repository.model.post.SimplePostEntity;
 import com.socialnetwork.boardrift.rest.model.BGGThingResponse;
 import com.socialnetwork.boardrift.rest.model.PostCommentDto;
@@ -38,6 +40,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -46,6 +50,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,6 +81,9 @@ public class PostServiceUnitTests {
 
     @Mock
     private PostCommentRepository postCommentRepository;
+
+    @Mock
+    private PostLikeRepository postLikeRepository;
 
     @Mock
     private UserService userService;
@@ -367,23 +375,103 @@ public class PostServiceUnitTests {
         when(postMapper.postCommentEntityToDto(postCommentEntity)).thenReturn(postCommentDto);
         when(postMapper.postCommentEntityToDto(postCommentEntity2)).thenReturn(postCommentDto2);
 
-        PostCommentPageDto result = postService.getPostComments(postType, postId, page, pageSize, request);
+        try (MockedStatic mockedStatic = Mockito.mockStatic(ServletUriComponentsBuilder.class)) {
+            mockedStatic.when(ServletUriComponentsBuilder::fromCurrentContextPath).thenReturn(mock(ServletUriComponentsBuilder.class));
 
-        assertNotNull(result);
-        assertNull(result.getNextPageUrl());
-        assertEquals(List.of(postCommentDto, postCommentDto2), result.getComments());
+            PostCommentPageDto result = postService.getPostComments(postType, postId, page, pageSize, request);
 
-        if ("simple".equals(postType)) {
-            verify(postCommentRepository, times(1)).findAllBySimplePostId(eq(postId), any(PageRequest.class));
-        } else if ("played-game".equals(postType)) {
-            verify(postCommentRepository, times(1)).findAllByPlayedGamePostId(eq(postId), any(PageRequest.class));
+            assertNotNull(result);
+            assertEquals(List.of(postCommentDto, postCommentDto2), result.getComments());
+
+            if ("simple".equals(postType)) {
+                verify(postCommentRepository, times(1)).findAllBySimplePostId(eq(postId), any(PageRequest.class));
+                assertEquals("null?page=2&pageSize=2", result.getNextPageUrl());
+            } else if ("played-game".equals(postType)) {
+                assertNull(result.getNextPageUrl());
+                verify(postCommentRepository, times(1)).findAllByPlayedGamePostId(eq(postId), any(PageRequest.class));
+            }
         }
     }
 
     private static Stream<Arguments> providePostTypeAndPageSize() {
         return Stream.of(
                 Arguments.of("simple", 2),
-                Arguments.of("played-game", 2)
+                Arguments.of("played-game", 1)
         );
+    }
+
+    @Test
+    void getPostComments_WithInvalidPostType_ShouldThrowException() {
+        String postType = "invalid";
+        Long postId = 1L;
+        PostCommentDto commentDto = new PostCommentDto();
+
+        assertThrows(FieldValidationException.class, () -> postService.getPostComments(postType, postId, 5, 15, null));
+    }
+
+    @Test
+    void likePost_SimplePost_Success() {
+        UserEntity userEntity = new UserEntity();
+        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+
+        Long postId = 1L;
+        when(simplePostRepository.findById(postId)).thenReturn(Optional.of(new SimplePostEntity()));
+
+        postService.likePost("simple", postId);
+
+        verify(postLikeRepository).findBySimplePostId(postId);
+        verify(postLikeRepository).save(any(PostLikeEntity.class));
+    }
+
+    @Test
+    void likePost_SimplePost_Unlike_Success() {
+        UserEntity userEntity = new UserEntity();
+        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+
+        Long postId = 1L;
+        when(postLikeRepository.findBySimplePostId(postId)).thenReturn(Optional.of(new PostLikeEntity()));
+
+        postService.likePost("simple", postId);
+
+        verify(postLikeRepository).findBySimplePostId(postId);
+        verify(postLikeRepository).delete(any(PostLikeEntity.class));
+    }
+
+    @Test
+    void likePost_PlayedGamePost_Success() {
+        UserEntity userEntity = new UserEntity();
+        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+
+        Long postId = 1L;
+        when(playedGamePostRepository.findById(postId)).thenReturn(Optional.of(new PlayedGamePostEntity()));
+
+        postService.likePost("played-game", postId);
+
+        verify(postLikeRepository).findByPlayedGamePostId(postId);
+        verify(postLikeRepository).save(any(PostLikeEntity.class));
+    }
+
+    @Test
+    void likePost_PlayedGamePost_Unlike_Success() {
+        UserEntity userEntity = new UserEntity();
+        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+
+        Long postId = 1L;
+        when(postLikeRepository.findByPlayedGamePostId(postId)).thenReturn(Optional.of(new PostLikeEntity()));
+
+        postService.likePost("played-game", postId);
+
+        verify(postLikeRepository).findByPlayedGamePostId(postId);
+        verify(postLikeRepository).delete(any(PostLikeEntity.class));
+    }
+
+    @Test
+    void likePost_InvalidPostType_ThrowException() {
+        Long postId = 1L;
+
+        FieldValidationException exception = org.junit.jupiter.api.Assertions.assertThrows(FieldValidationException.class, () -> {
+            postService.likePost("invalid", postId);
+        });
+        assertEquals("This post type does not support likes", exception.getFieldErrors().get("postType"));
     }
 }

@@ -32,6 +32,11 @@ import java.util.List;
 public class PostController {
     private final PostService postService;
 
+    @GetMapping("/feed")
+    public ResponseEntity<List<Object>> getFeed(@RequestParam(name = "feedSize") Integer feedSize) {
+        return ResponseEntity.ok(postService.getFeed(feedSize));
+    }
+
     @GetMapping("/{postType}/{postId}/comments")
     public ResponseEntity<PostCommentPageDto> getPostComments(@PathVariable(name = "postType") String postType,
                                                               @PathVariable(name = "postId") Long postId,

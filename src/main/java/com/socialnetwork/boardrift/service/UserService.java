@@ -14,14 +14,18 @@ import com.socialnetwork.boardrift.util.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,6 +54,7 @@ public class UserService {
 
         UserEntity userEntity = userMapper.registrationDtoToEntity(userRegistrationDto);
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setFeedQueue(new PriorityQueue<>());
         userEntity = userRepository.save(userEntity);
 
         emailService.sendEmailVerification(servletRequest, userEntity);
