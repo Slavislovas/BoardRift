@@ -27,9 +27,13 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerUnitTests {
@@ -62,12 +66,28 @@ public class UserControllerUnitTests {
     }
 
     @Test
+    void searchFriendsByNameShouldSucceed() throws IllegalAccessException {
+        // Arrange
+        Long userId = 1L;
+        Set<UserRetrievalMinimalDto> expectedUsers = new HashSet<>(); // assuming this is populated somehow
+        when(userService.searchFriendsByName(userId, null)).thenReturn(expectedUsers);
+
+        // Act
+        ResponseEntity<Set<UserRetrievalMinimalDto>> response = userController.searchFriendsByName(userId, null);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedUsers, response.getBody());
+        verify(userService, times(1)).searchFriendsByName(userId, null);
+    }
+
+    @Test
     void createUserShouldPassWhenRequestBodyValid() {
-        Mockito.when(userService.createUser(any(), any())).thenReturn(userRetrievalDto);
+        when(userService.createUser(any(), any())).thenReturn(userRetrievalDto);
 
         ResponseEntity<UserRetrievalDto> result = userController.createUser(userRegistrationDto, new MapBindingResult(Collections.EMPTY_MAP, "userRegistrationDto"), new MockHttpServletRequest());
-        Assertions.assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        Assertions.assertEquals(userRetrievalDto, result.getBody());
+        assertEquals(HttpStatus.CREATED, result.getStatusCode());
+        assertEquals(userRetrievalDto, result.getBody());
     }
 
     @Test
@@ -75,7 +95,7 @@ public class UserControllerUnitTests {
         BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "userRegistrationDto");
         bindingResult.addError(new FieldError("fieldError", "name", "Name is invalid"));
 
-        Assertions.assertThrows(FieldValidationException.class, () -> userController.createUser(userRegistrationDto, bindingResult, new MockHttpServletRequest()));
+        assertThrows(FieldValidationException.class, () -> userController.createUser(userRegistrationDto, bindingResult, new MockHttpServletRequest()));
     }
 
     @Test
@@ -83,60 +103,60 @@ public class UserControllerUnitTests {
         Mockito.doNothing().when(userService).confirmUserRegistration(any());
         ResponseEntity<Void> result = userController.confirmUserRegistration("token");
 
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 
     @Test
     void getReceivedFriendRequestsShouldSucceed() {
-        Mockito.when(userService.getReceivedFriendRequests()).thenReturn(Set.of(userRetrievalMinimalDto));
+        when(userService.getReceivedFriendRequests()).thenReturn(Set.of(userRetrievalMinimalDto));
         ResponseEntity<Set<UserRetrievalMinimalDto>> result = userController.getReceivedFriendRequests();
 
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
-        Assertions.assertEquals(Set.of(userRetrievalMinimalDto), result.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(Set.of(userRetrievalMinimalDto), result.getBody());
     }
 
     @Test
     void getSentFriendRequestsShouldSucceed() {
-        Mockito.when(userService.getSentFriendRequests()).thenReturn(Set.of(userRetrievalMinimalDto));
+        when(userService.getSentFriendRequests()).thenReturn(Set.of(userRetrievalMinimalDto));
         ResponseEntity<Set<UserRetrievalMinimalDto>> result = userController.getSentFriendRequests();
 
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
-        Assertions.assertEquals(Set.of(userRetrievalMinimalDto), result.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(Set.of(userRetrievalMinimalDto), result.getBody());
     }
 
     @Test
     void getFriendsShouldSucceed() throws IllegalAccessException {
-        Mockito.when(userService.getFriends(any())).thenReturn(Set.of(userRetrievalMinimalDto));
+        when(userService.getFriends(any())).thenReturn(Set.of(userRetrievalMinimalDto));
         ResponseEntity<Set<UserRetrievalMinimalDto>> result = userController.getFriends(1L);
 
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
-        Assertions.assertEquals(Set.of(userRetrievalMinimalDto), result.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(Set.of(userRetrievalMinimalDto), result.getBody());
     }
 
     @Test
     void sendFriendRequestShouldSucceed() {
-        Mockito.when(userService.sendFriendRequest(any())).thenReturn(friendRequestDto);
+        when(userService.sendFriendRequest(any())).thenReturn(friendRequestDto);
         ResponseEntity<FriendRequestDto> result = userController.sendFriendRequest(1L);
 
-        Assertions.assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        Assertions.assertEquals(friendRequestDto, result.getBody());
+        assertEquals(HttpStatus.CREATED, result.getStatusCode());
+        assertEquals(friendRequestDto, result.getBody());
     }
 
     @Test
     void acceptFriendRequestShouldSucceed() {
-        Mockito.when(userService.acceptFriendRequest(any())).thenReturn(userRetrievalMinimalDto);
+        when(userService.acceptFriendRequest(any())).thenReturn(userRetrievalMinimalDto);
         ResponseEntity<UserRetrievalMinimalDto> result = userController.acceptFriendRequest(1L);
 
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
-        Assertions.assertEquals(userRetrievalMinimalDto, result.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals(userRetrievalMinimalDto, result.getBody());
     }
 
     @Test
     void declineFriendRequestShouldSucceed() {
-        Mockito.when(userService.declineFriendRequest(any())).thenReturn("Friend request declined successfully");
+        when(userService.declineFriendRequest(any())).thenReturn("Friend request declined successfully");
         ResponseEntity<String> result = userController.declineFriendRequest(1L);
 
-        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
-        Assertions.assertEquals("Friend request declined successfully", result.getBody());
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("Friend request declined successfully", result.getBody());
     }
 }

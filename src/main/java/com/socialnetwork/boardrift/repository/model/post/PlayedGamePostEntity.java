@@ -1,7 +1,9 @@
-package com.socialnetwork.boardrift.repository.model.played_game_post;
+package com.socialnetwork.boardrift.repository.model.post;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
+import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
+import com.socialnetwork.boardrift.repository.model.post.PostLikeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,13 +17,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -71,9 +76,13 @@ public class PlayedGamePostEntity {
     )
     private Set<PlayedGameEntity> plays;
 
-    @OneToMany(mappedBy = "commentedPost")
-    private Set<PlayedGamePostCommentEntity> comments;
+    @OneToMany(mappedBy = "playedGamePost", cascade = {CascadeType.ALL})
+    private List<PostCommentEntity> comments;
 
-    @OneToMany(mappedBy = "likedPost")
-    private Set<PlayedGamePostLikeEntity> likes;
+    @OneToMany(mappedBy = "playedGamePost", cascade = {CascadeType.ALL})
+    private Set<PostLikeEntity> likes;
+
+    public void addComment(PostCommentEntity playedGamePostCommentEntity) {
+        comments.add(playedGamePostCommentEntity);
+    }
 }

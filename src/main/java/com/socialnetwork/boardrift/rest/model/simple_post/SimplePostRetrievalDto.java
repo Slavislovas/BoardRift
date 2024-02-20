@@ -17,7 +17,8 @@ public class SimplePostRetrievalDto {
     private String description;
     private Instant creationDate;
     private UserRetrievalMinimalDto postCreator;
-    private Set<PostCommentDto> comments;
+    private Integer comments;
     private Integer likes;
+    private Boolean alreadyLiked = false;
     private String type = "simple";
 }

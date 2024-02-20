@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.repository.model.simple_post;
+package com.socialnetwork.boardrift.repository.model.post;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import jakarta.persistence.Column;
@@ -14,21 +14,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "played-game-post-likes")
-public class SimplePostLikeEntity {
+@Table(name = "poll-post-option-votes")
+public class PollOptionVoteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_played-game-post-like")
+    @Column(name = "id_vote")
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_like-owner")
-    private UserEntity likeOwner;
+    @JoinColumn(name = "id_poll-option")
+    private PollOptionEntity option;
 
     @ManyToOne
-    @JoinColumn(name = "id_liked-post")
-    private SimplePostEntity likedPost;
+    @JoinColumn(name = "id_user")
+    private UserEntity voter;
 }

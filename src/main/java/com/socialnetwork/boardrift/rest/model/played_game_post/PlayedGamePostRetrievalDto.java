@@ -25,7 +25,8 @@ public class PlayedGamePostRetrievalDto {
     private Double averageScore;
     private UserRetrievalMinimalDto postCreator;
     private Set<PlayedGameDto> plays;
-    private Set<PostCommentDto> comments;
+    private Integer comments;
     private Integer likes;
+    private Boolean alreadyLiked = false;
     private String type = "played-game";
 }

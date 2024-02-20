@@ -1,5 +1,6 @@
-package com.socialnetwork.boardrift.repository.model.marketplace_post;
+package com.socialnetwork.boardrift.repository.model.post;
 
+import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,9 +46,9 @@ public class MarketplacePostEntity {
     @JoinColumn(name = "id_post-creator")
     private UserEntity postCreator;
 
-    @OneToMany(mappedBy = "commentedPost")
-    private Set<MarketplacePostCommentEntity> comments;
+    @OneToMany(mappedBy = "marketplacePost")
+    private Set<PostCommentEntity> comments;
 
-    @OneToMany(mappedBy = "likedPost")
-    private Set<MarketplacePostLikeEntity> likes;
+    @OneToMany(mappedBy = "marketplacePost")
+    private Set<PostLikeEntity> likes;
 }

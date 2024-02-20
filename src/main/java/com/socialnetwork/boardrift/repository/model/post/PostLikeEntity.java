@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.repository.model.played_game_post;
+package com.socialnetwork.boardrift.repository.model.post;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import jakarta.persistence.Column;
@@ -10,33 +10,35 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.Instant;
-
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "played-game-post-comments")
-public class PlayedGamePostCommentEntity {
+@Table(name = "post-likes")
+public class PostLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_played-game-post-comment")
+    @Column(name = "id_post-like")
     private Long id;
 
-    @Column(name = "text")
-    private String text;
-
-    @Column(name = "creation-date")
-    private Instant creationDate;
+    @ManyToOne
+    @JoinColumn(name = "id_like-owner")
+    private UserEntity likeOwner;
 
     @ManyToOne
-    @JoinColumn(name = "id_commented-played-game-post")
-    private PlayedGamePostEntity commentedPost;
+    @JoinColumn(name = "id_simple-post")
+    private SimplePostEntity simplePost;
 
     @ManyToOne
-    @JoinColumn(name = "id_comment-creator")
-    private UserEntity commentCreator;
+    @JoinColumn(name = "id_played-game-post")
+    private PlayedGamePostEntity playedGamePost;
+
+    @ManyToOne
+    @JoinColumn(name = "id_marketplace-post")
+    private MarketplacePostEntity marketplacePost;
 }

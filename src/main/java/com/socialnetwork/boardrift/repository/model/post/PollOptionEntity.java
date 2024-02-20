@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.repository.model.poll_post;
+package com.socialnetwork.boardrift.repository.model.post;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import jakarta.persistence.CascadeType;
