@@ -18,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "chat-messages")
+@Table(name = "chat_messages")
 public class ChatMessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

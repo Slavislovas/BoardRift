@@ -9,6 +9,7 @@ import com.socialnetwork.boardrift.util.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -28,12 +31,14 @@ import java.util.Set;
 @RequestMapping("/users")
 @RestController
 public class UserController {
+    @Value("${client.domain}")
+    private String clientDomain;
     private final UserService userService;
 
     @GetMapping("/register/confirm")
-    public ResponseEntity<Void> confirmUserRegistration(@RequestParam("token") String token) {
+    public RedirectView confirmUserRegistration(@RequestParam("token") String token) {
         userService.confirmUserRegistration(token);
-        return ResponseEntity.ok().build();
+        return new RedirectView(clientDomain + "/login");
     }
 
     @GetMapping("/friend-requests/received")

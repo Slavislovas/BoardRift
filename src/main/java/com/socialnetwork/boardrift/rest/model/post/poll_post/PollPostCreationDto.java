@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model.poll_post;
+package com.socialnetwork.boardrift.rest.model.post.poll_post;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

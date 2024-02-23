@@ -23,11 +23,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "marketplace-posts")
+@Table(name = "marketplace_posts")
 public class MarketplacePostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_marketplace-post")
+    @Column(name = "id_marketplace_post")
     private Long id;
 
     @Column(name = "title")
@@ -36,14 +36,14 @@ public class MarketplacePostEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "creation-date")
+    @Column(name = "creation_date")
     private Instant creationDate;
 
     @Column(name = "price")
     private BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "id_post-creator")
+    @JoinColumn(name = "id_post_creator")
     private UserEntity postCreator;
 
     @OneToMany(mappedBy = "marketplacePost")

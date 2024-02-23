@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "played-games")
+@Table(name = "played_games")
 public class PlayedGameEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class PlayedGameEntity {
     @Column(name = "won")
     private Boolean won;
 
-    @Column(name = "scoring-system")
+    @Column(name = "scoring_system")
     private String scoringSystem;
 
     @ManyToOne

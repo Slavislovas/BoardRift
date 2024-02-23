@@ -2,8 +2,6 @@ package com.socialnetwork.boardrift.repository.model.post;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
-import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
-import com.socialnetwork.boardrift.repository.model.post.PostLikeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,49 +28,49 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "played-game-posts")
-public class PlayedGamePostEntity {
+@Table(name = "played_game_posts")
+public class PlayedGamePostEntity implements Post{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_played-game-post")
+    @Column(name = "id_played_game_post")
     private Long id;
 
-    @Column(name = "id_bgg-game")
+    @Column(name = "id_bgg_game")
     private Long bggGameId;
 
-    @Column(name = "game-name")
+    @Column(name = "game_name")
     private String gameName;
 
-    @Column(name = "game-picture-url")
+    @Column(name = "game_picture_url")
     private String gamePictureUrl;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "creation-date")
+    @Column(name = "creation_date")
     private Date creationDate;
 
-    @Column(name = "highest-score")
+    @Column(name = "highest_score")
     private Integer highestScore;
 
-    @Column(name = "lowest-score")
+    @Column(name = "lowest_score")
     private Integer lowestScore;
 
-    @Column(name = "average-score")
+    @Column(name = "average_score")
     private Double averageScore;
 
-    @Column(name = "scoring-system")
+    @Column(name = "scoring_system")
     private String scoringSystem;
 
     @ManyToOne
-    @JoinColumn(name = "id_post-creator")
+    @JoinColumn(name = "id_post_creator")
     private UserEntity postCreator;
 
     @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(
-            name = "posted-plays",
-            joinColumns = @JoinColumn(name = "id_played-game-post"),
-            inverseJoinColumns = @JoinColumn(name = "id_posted-play")
+            name = "posted_plays",
+            joinColumns = @JoinColumn(name = "id_played_game_post"),
+            inverseJoinColumns = @JoinColumn(name = "id_posted_play")
     )
     private Set<PlayedGameEntity> plays;
 

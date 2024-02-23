@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model.played_game_post;
+package com.socialnetwork.boardrift.rest.model.post.played_game_post;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

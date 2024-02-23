@@ -21,32 +21,32 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "post-comments")
+@Table(name = "post_comments")
 public class PostCommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_simple-post-comment")
+    @Column(name = "id_post_comment")
     private Long id;
 
     @Column(name = "text")
     private String text;
 
-    @Column(name = "creation-date")
+    @Column(name = "creation_date")
     private Instant creationDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_simple-post")
+    @JoinColumn(name = "id_simple_post")
     private SimplePostEntity simplePost;
 
     @ManyToOne
-    @JoinColumn(name = "id_played-game-post")
+    @JoinColumn(name = "id_played_game_post")
     private PlayedGamePostEntity playedGamePost;
 
     @ManyToOne
-    @JoinColumn(name = "id_marketplace-post")
+    @JoinColumn(name = "id_marketplace_post")
     private MarketplacePostEntity marketplacePost;
 
     @ManyToOne
-    @JoinColumn(name = "id_comment-creator")
+    @JoinColumn(name = "id_comment_creator")
     private UserEntity commentCreator;
 }

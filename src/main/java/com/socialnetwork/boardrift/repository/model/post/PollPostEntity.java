@@ -24,21 +24,21 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "poll-posts")
-public class PollPostEntity {
+@Table(name = "poll_posts")
+public class PollPostEntity implements Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_poll-post")
+    @Column(name = "id_poll_post")
     private Long id;
 
     @Column(name = "question")
     private String question;
 
-    @Column(name = "creation-date")
+    @Column(name = "creation_date")
     private Date creationDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_post-creator")
+    @JoinColumn(name = "id_post_creator")
     private UserEntity postCreator;
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})

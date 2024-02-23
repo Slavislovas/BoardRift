@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "chat-rooms")
+@Table(name = "chat_rooms")
 public class ChatRoomEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

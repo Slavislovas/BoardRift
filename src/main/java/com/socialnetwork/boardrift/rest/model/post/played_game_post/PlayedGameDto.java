@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model.played_game_post;
+package com.socialnetwork.boardrift.rest.model.post.played_game_post;
 
 import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
 import lombok.AllArgsConstructor;

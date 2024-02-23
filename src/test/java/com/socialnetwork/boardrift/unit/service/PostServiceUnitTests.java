@@ -15,15 +15,15 @@ import com.socialnetwork.boardrift.repository.model.post.PollPostEntity;
 import com.socialnetwork.boardrift.repository.model.post.PostLikeEntity;
 import com.socialnetwork.boardrift.repository.model.post.SimplePostEntity;
 import com.socialnetwork.boardrift.rest.model.BGGThingResponse;
-import com.socialnetwork.boardrift.rest.model.PostCommentDto;
-import com.socialnetwork.boardrift.rest.model.PostCommentPageDto;
-import com.socialnetwork.boardrift.rest.model.played_game_post.PlayedGamePostCreationDto;
-import com.socialnetwork.boardrift.rest.model.played_game_post.PlayedGamePostRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.poll_post.PollOptionDto;
-import com.socialnetwork.boardrift.rest.model.poll_post.PollPostCreationDto;
-import com.socialnetwork.boardrift.rest.model.poll_post.PollPostRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.simple_post.SimplePostCreationDto;
-import com.socialnetwork.boardrift.rest.model.simple_post.SimplePostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
+import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
+import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.poll_post.PollOptionDto;
+import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostRetrievalDto;
 import com.socialnetwork.boardrift.service.BoardGameService;
 import com.socialnetwork.boardrift.service.PostService;
 import com.socialnetwork.boardrift.service.UserService;
@@ -336,7 +336,7 @@ public class PostServiceUnitTests {
         when(pollPostRepository.save(any(PollPostEntity.class))).thenReturn(savedPollPostEntity);
 
         PollPostRetrievalDto expectedDto = new PollPostRetrievalDto();
-        when(postMapper.pollPostEntityToRetrievalDto(savedPollPostEntity, false)).thenReturn(expectedDto);
+        when(postMapper.pollPostEntityToRetrievalDto(savedPollPostEntity)).thenReturn(expectedDto);
 
         // Act
         PollPostRetrievalDto result = postService.createPollPost(pollPostCreationDto);
@@ -345,7 +345,7 @@ public class PostServiceUnitTests {
         assertEquals(expectedDto, result);
         verify(userService, times(1)).getUserEntityByUsername(any());
         verify(pollPostRepository, times(1)).save(any(PollPostEntity.class));
-        verify(postMapper, times(1)).pollPostEntityToRetrievalDto(savedPollPostEntity, false);
+        verify(postMapper, times(1)).pollPostEntityToRetrievalDto(savedPollPostEntity);
     }
 
     @ParameterizedTest
@@ -412,6 +412,7 @@ public class PostServiceUnitTests {
     @Test
     void likePost_SimplePost_Success() {
         UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
         when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
 
         Long postId = 1L;
@@ -419,27 +420,29 @@ public class PostServiceUnitTests {
 
         postService.likePost("simple", postId);
 
-        verify(postLikeRepository).findBySimplePostId(postId);
+        verify(postLikeRepository).findBySimplePostIdAndLikeOwnerId(postId, userEntity.getId());
         verify(postLikeRepository).save(any(PostLikeEntity.class));
     }
 
     @Test
     void likePost_SimplePost_Unlike_Success() {
         UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
         when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
 
         Long postId = 1L;
-        when(postLikeRepository.findBySimplePostId(postId)).thenReturn(Optional.of(new PostLikeEntity()));
+        when(postLikeRepository.findBySimplePostIdAndLikeOwnerId(postId, userEntity.getId())).thenReturn(Optional.of(new PostLikeEntity()));
 
         postService.likePost("simple", postId);
 
-        verify(postLikeRepository).findBySimplePostId(postId);
+        verify(postLikeRepository).findBySimplePostIdAndLikeOwnerId(postId, userEntity.getId());
         verify(postLikeRepository).delete(any(PostLikeEntity.class));
     }
 
     @Test
     void likePost_PlayedGamePost_Success() {
         UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
         when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
 
         Long postId = 1L;
@@ -447,7 +450,7 @@ public class PostServiceUnitTests {
 
         postService.likePost("played-game", postId);
 
-        verify(postLikeRepository).findByPlayedGamePostId(postId);
+        verify(postLikeRepository).findByPlayedGamePostIdAndLikeOwnerId(postId, userEntity.getId());
         verify(postLikeRepository).save(any(PostLikeEntity.class));
     }
 
@@ -457,11 +460,11 @@ public class PostServiceUnitTests {
         when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
 
         Long postId = 1L;
-        when(postLikeRepository.findByPlayedGamePostId(postId)).thenReturn(Optional.of(new PostLikeEntity()));
+        when(postLikeRepository.findByPlayedGamePostIdAndLikeOwnerId(postId, userEntity.getId())).thenReturn(Optional.of(new PostLikeEntity()));
 
         postService.likePost("played-game", postId);
 
-        verify(postLikeRepository).findByPlayedGamePostId(postId);
+        verify(postLikeRepository).findByPlayedGamePostIdAndLikeOwnerId(postId, userEntity.getId());
         verify(postLikeRepository).delete(any(PostLikeEntity.class));
     }
 

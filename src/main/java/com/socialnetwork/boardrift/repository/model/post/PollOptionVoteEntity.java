@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "poll-post-option-votes")
+@Table(name = "poll_post_option_votes")
 public class PollOptionVoteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class PollOptionVoteEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_poll-option")
+    @JoinColumn(name = "id_poll_option")
     private PollOptionEntity option;
 
     @ManyToOne

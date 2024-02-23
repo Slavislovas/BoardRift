@@ -1,5 +1,6 @@
-package com.socialnetwork.boardrift.rest.model;
+package com.socialnetwork.boardrift.rest.model.post;
 
+import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -22,7 +22,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "email-verification-tokens")
+@Table(name = "email_verification_tokens")
 public class EmailVerificationTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

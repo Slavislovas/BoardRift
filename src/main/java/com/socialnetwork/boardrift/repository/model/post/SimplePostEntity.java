@@ -1,8 +1,6 @@
 package com.socialnetwork.boardrift.repository.model.post;
 
-import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
-import com.socialnetwork.boardrift.repository.model.post.PostLikeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,21 +25,21 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "simple-posts")
-public class SimplePostEntity {
+@Table(name = "posts")
+public class SimplePostEntity implements Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_simple-post")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "creation-date")
+    @Column(name = "creation_date")
     private Date creationDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_post-creator")
+    @JoinColumn(name = "id_post_creator")
     private UserEntity postCreator;
 
     @OneToMany(mappedBy = "simplePost", cascade = {CascadeType.ALL})

@@ -1,13 +1,15 @@
 package com.socialnetwork.boardrift.rest.controller;
 
-import com.socialnetwork.boardrift.rest.model.PostCommentDto;
-import com.socialnetwork.boardrift.rest.model.PostCommentPageDto;
-import com.socialnetwork.boardrift.rest.model.played_game_post.PlayedGamePostCreationDto;
-import com.socialnetwork.boardrift.rest.model.played_game_post.PlayedGamePostRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.poll_post.PollPostCreationDto;
-import com.socialnetwork.boardrift.rest.model.poll_post.PollPostRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.simple_post.SimplePostCreationDto;
-import com.socialnetwork.boardrift.rest.model.simple_post.SimplePostRetrievalDto;
+import com.socialnetwork.boardrift.repository.model.post.Post;
+import com.socialnetwork.boardrift.rest.model.post.FeedPageDto;
+import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
+import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
+import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostRetrievalDto;
 import com.socialnetwork.boardrift.service.PostService;
 import com.socialnetwork.boardrift.util.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,8 +35,10 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/feed")
-    public ResponseEntity<List<Object>> getFeed(@RequestParam(name = "feedSize") Integer feedSize) {
-        return ResponseEntity.ok(postService.getFeed(feedSize));
+    public ResponseEntity<FeedPageDto> getFeed(@RequestParam(name = "page") Integer page,
+                                               @RequestParam(name ="pageSize") Integer pageSize,
+                                               HttpServletRequest request) {
+        return ResponseEntity.ok(postService.getFeed(page, pageSize, request));
     }
 
     @GetMapping("/{postType}/{postId}/comments")

@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model.simple_post;
+package com.socialnetwork.boardrift.rest.model.post.simple_post;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

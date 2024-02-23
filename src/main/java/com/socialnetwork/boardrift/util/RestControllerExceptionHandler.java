@@ -1,6 +1,7 @@
 package com.socialnetwork.boardrift.util;
 
 import com.socialnetwork.boardrift.util.exception.DuplicateFriendRequestException;
+import com.socialnetwork.boardrift.util.exception.DuplicatePollVoteException;
 import com.socialnetwork.boardrift.util.exception.EmailNotVerifiedException;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
 import com.socialnetwork.boardrift.util.exception.EmailVerificationTokenExpiredException;
@@ -20,6 +21,12 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class RestControllerExceptionHandler {
+
+    @ExceptionHandler(DuplicatePollVoteException.class)
+    public ResponseEntity<String> handleDuplicatePollVoteException(DuplicatePollVoteException exception, HttpServletRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(FieldValidationException.class)
     public ResponseEntity<Map<String, String>> handleFieldValidationException(FieldValidationException exception, HttpServletRequest request) {
         return new ResponseEntity<>(exception.getFieldErrors(), HttpStatus.BAD_REQUEST);

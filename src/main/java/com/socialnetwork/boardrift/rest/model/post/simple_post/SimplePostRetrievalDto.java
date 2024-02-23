@@ -1,21 +1,20 @@
-package com.socialnetwork.boardrift.rest.model.simple_post;
+package com.socialnetwork.boardrift.rest.model.post.simple_post;
 
-import com.socialnetwork.boardrift.rest.model.PostCommentDto;
+import com.socialnetwork.boardrift.repository.model.post.Post;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-import java.util.Set;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SimplePostRetrievalDto {
+public class SimplePostRetrievalDto implements Post {
     private Long id;
     private String description;
-    private Instant creationDate;
+    private Date creationDate;
     private UserRetrievalMinimalDto postCreator;
     private Integer comments;
     private Integer likes;

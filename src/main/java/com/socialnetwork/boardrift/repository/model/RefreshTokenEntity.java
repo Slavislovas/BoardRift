@@ -18,14 +18,14 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "refresh-tokens")
+@Table(name = "refresh_tokens")
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "token")
     private String token;
 
-    @Column(name = "expiration-date")
+    @Column(name = "expiration_date")
     private Date expirationDate;
 
     @OneToOne

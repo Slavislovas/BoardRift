@@ -23,7 +23,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "poll-post-options")
+@Table(name = "poll_post_options")
 public class PollOptionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class PollOptionEntity {
     private String text;
 
     @ManyToOne
-    @JoinColumn(name = "id_poll-post")
+    @JoinColumn(name = "id_poll_post")
     private PollPostEntity post;
 
     @OneToMany(mappedBy = "option", cascade = {CascadeType.ALL})

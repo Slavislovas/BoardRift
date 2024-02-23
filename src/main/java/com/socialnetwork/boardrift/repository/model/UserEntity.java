@@ -26,7 +26,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Set;
 
 @Getter
@@ -74,11 +73,8 @@ public class UserEntity implements UserDetails {
     @Column(name = "status")
     private UserStatus status = UserStatus.OFFLINE;
 
-    @Column(name = "email-verified")
+    @Column(name = "email_verified")
     private Boolean emailVerified = false;
-
-    @Column(name = "feed-queue")
-    private PriorityQueue<String> feedQueue;
 
     @ManyToMany
     @JoinTable(
@@ -101,7 +97,7 @@ public class UserEntity implements UserDetails {
 
     @ManyToMany
     @JoinTable(
-            name = "friend-invites",
+            name = "friend_invites",
             joinColumns = @JoinColumn(name = "id_sender", referencedColumnName = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_receiver", referencedColumnName = "id_user")
     )
@@ -109,7 +105,7 @@ public class UserEntity implements UserDetails {
 
     @ManyToMany
     @JoinTable(
-            name = "friend-invites",
+            name = "friend_invites",
             joinColumns = @JoinColumn(name = "id_receiver", referencedColumnName = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_sender", referencedColumnName = "id_user")
     )
@@ -162,21 +158,11 @@ public class UserEntity implements UserDetails {
         friends.add(sender);
     }
 
-    public Set<UserEntity> getFriends() {
-        Set<UserEntity> friends = new HashSet<>(this.friends);
-        friends.addAll(this.friendOf);
-        return friends;
-    }
-
     public void removeReceivedFriendRequest(UserEntity senderUserEntity) {
         receivedFriendInvites.remove(senderUserEntity);
     }
 
     public void addPlayedGame(PlayedGameEntity playedGame) {
         playedGames.add(playedGame);
-    }
-
-    public void addPostToFeedQueue(String postType, Long id) {
-        feedQueue.add(String.format("%s %d", postType, id));
     }
 }

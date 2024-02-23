@@ -54,7 +54,6 @@ public class UserService {
 
         UserEntity userEntity = userMapper.registrationDtoToEntity(userRegistrationDto);
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-        userEntity.setFeedQueue(new PriorityQueue<>());
         userEntity = userRepository.save(userEntity);
 
         emailService.sendEmailVerification(servletRequest, userEntity);

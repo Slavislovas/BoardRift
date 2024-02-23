@@ -2,14 +2,14 @@ package com.socialnetwork.boardrift.unit.controller;
 
 import com.socialnetwork.boardrift.enumeration.UserStatus;
 import com.socialnetwork.boardrift.rest.controller.PostController;
-import com.socialnetwork.boardrift.rest.model.PostCommentDto;
-import com.socialnetwork.boardrift.rest.model.PostCommentPageDto;
+import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
+import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
-import com.socialnetwork.boardrift.rest.model.played_game_post.PlayedGamePostRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.poll_post.PollPostCreationDto;
-import com.socialnetwork.boardrift.rest.model.poll_post.PollPostRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.simple_post.SimplePostCreationDto;
-import com.socialnetwork.boardrift.rest.model.simple_post.SimplePostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostCreationDto;
+import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostRetrievalDto;
 import com.socialnetwork.boardrift.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +23,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,7 +49,7 @@ public class PostControllerUnitTests {
     @BeforeEach
     void init() {
         userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
-        playedGamePostRetrievalDto = new PlayedGamePostRetrievalDto(1L, 2L, "gameName", "gamePicture", "Description", "no-score", Instant.now(), 500, 300, 1.20, userRetrievalMinimalDto, new HashSet<>(), 5, 0, false, null);
+        playedGamePostRetrievalDto = new PlayedGamePostRetrievalDto(1L, 2L, "gameName", "gamePicture", "Description", "no-score", new Date(), 500, 300, 1.20, userRetrievalMinimalDto, new HashSet<>(), 5, 0, false, null);
         postCommentPageDto = new PostCommentPageDto("nextUrl", new ArrayList<>());
     }
 
