@@ -62,6 +62,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getId().toString())
                 .claim("role", userDetails.getRole())
+                .claim("profilePictureUrl", userDetails.getProfilePictureUrl())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

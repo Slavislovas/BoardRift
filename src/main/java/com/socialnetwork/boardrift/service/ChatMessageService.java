@@ -4,6 +4,7 @@ import com.socialnetwork.boardrift.repository.ChatMessageRepository;
 import com.socialnetwork.boardrift.repository.model.ChatMessageEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.rest.model.ChatMessageDto;
+import com.socialnetwork.boardrift.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,7 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomService chatRoomService;
     private final UserService userService;
+    private final UserMapper userMapper;
 
     public ChatMessageDto saveChatMessage(ChatMessageDto chatMessageDto) throws IllegalAccessException {
         String chatId = chatRoomService.getChatRoomId(chatMessageDto.getSenderId(), chatMessageDto.getRecipientId(), true).orElseThrow();
@@ -34,8 +36,10 @@ public class ChatMessageService {
         return new ChatMessageDto(savedChatMessage.getChatId(),
                 savedChatMessage.getContent(),
                 savedChatMessage.getTimestamp(),
-                chatMessageEntity.getSender().getId(),
-                chatMessageEntity.getRecipient().getId());
+                null,
+                null,
+                userMapper.entityToMinimalRetrievalDto(chatMessageEntity.getSender()),
+                userMapper.entityToMinimalRetrievalDto(chatMessageEntity.getRecipient()));
     }
 
     private boolean tryingToSendMessageToNonFriend(ChatMessageDto chatMessageDto, UserEntity senderUserEntity) {
@@ -64,8 +68,10 @@ public class ChatMessageService {
                     return new ChatMessageDto(chatMessageEntity.getChatId(),
                             chatMessageEntity.getContent(),
                             chatMessageEntity.getTimestamp(),
-                            chatMessageEntity.getSender().getId(),
-                            chatMessageEntity.getRecipient().getId());
+                            null,
+                            null,
+                            userMapper.entityToMinimalRetrievalDto(chatMessageEntity.getSender()),
+                            userMapper.entityToMinimalRetrievalDto(chatMessageEntity.getRecipient()));
                 })
                 .sorted(Comparator.comparing(ChatMessageDto::getTimestamp))
                 .collect(Collectors.toList());

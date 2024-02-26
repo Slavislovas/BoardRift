@@ -35,6 +35,11 @@ public class UserController {
     private String clientDomain;
     private final UserService userService;
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserRetrievalDto> getUserById(@PathVariable(name = "userId") Long userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
     @GetMapping("/register/confirm")
     public RedirectView confirmUserRegistration(@RequestParam("token") String token) {
         userService.confirmUserRegistration(token);

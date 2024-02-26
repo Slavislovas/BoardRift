@@ -258,4 +258,9 @@ public class UserService {
                         .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet()));
         return friends;
     }
+
+    public UserRetrievalDto getUserById(Long userId) {
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+        return userMapper.entityToRetrievalDto(userEntity);
+    }
 }
