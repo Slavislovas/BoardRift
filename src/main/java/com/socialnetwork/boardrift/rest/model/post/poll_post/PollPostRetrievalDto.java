@@ -14,11 +14,14 @@ import java.util.Set;
 @AllArgsConstructor
 public class PollPostRetrievalDto implements Post {
     private Long id;
-    private String question;
+    private String description;
     private Date creationDate;
     private UserRetrievalMinimalDto postCreator;
     private Set<PollOptionRetrievalDto> options;
     private Boolean alreadyVoted = false;
     private PollOptionRetrievalDto selectedOption;
     private String type = "poll";
+    private Integer likes;
+    private Integer comments;
+    private Boolean alreadyLiked = false;
 }

@@ -12,8 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PollPostCreationDto {
-    @NotBlank(message = "Question is required")
-    private String question;
+    @NotBlank(message = "Description is required")
+    private String description;
 
     @NotEmpty(message = "At least one option is required")
     private List<PollOptionDto> options;

@@ -14,8 +14,11 @@ import java.util.Map;
 @Repository
 public interface SimplePostRepository extends JpaRepository<SimplePostEntity, Long> {
     @Query("SELECT sp FROM SimplePostEntity sp " +
-            "WHERE sp.postCreator = :postCreator " +
+            "WHERE (sp.postCreator = :postCreator " +
             "OR sp.postCreator IN (SELECT f FROM UserEntity u JOIN u.friends f WHERE u = :postCreator) " +
-            "OR sp.postCreator IN (SELECT f FROM UserEntity u JOIN u.friendOf f WHERE u = :postCreator)")
+            "OR sp.postCreator IN (SELECT f FROM UserEntity u JOIN u.friendOf f WHERE u = :postCreator)) " +
+            "AND sp.childPlayedGamePost IS NULL " +
+            "AND sp.childMarketplacePost IS NULL " +
+            "AND sp.childPollPost IS NULL")
     List<SimplePostEntity> findAllByPostCreatorOrFriends(@Param("postCreator") UserEntity postCreator, Pageable pageable);
 }

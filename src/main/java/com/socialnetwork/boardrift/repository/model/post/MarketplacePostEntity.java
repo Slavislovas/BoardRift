@@ -2,6 +2,7 @@ package com.socialnetwork.boardrift.repository.model.post;
 
 import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,22 +35,10 @@ public class MarketplacePostEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "creation_date")
-    private Instant creationDate;
-
     @Column(name = "price")
     private BigDecimal price;
 
-    @ManyToOne
-    @JoinColumn(name = "id_post_creator")
-    private UserEntity postCreator;
-
-    @OneToMany(mappedBy = "marketplacePost")
-    private Set<PostCommentEntity> comments;
-
-    @OneToMany(mappedBy = "marketplacePost")
-    private Set<PostLikeEntity> likes;
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "id_simple_post")
+    private SimplePostEntity basePost;
 }

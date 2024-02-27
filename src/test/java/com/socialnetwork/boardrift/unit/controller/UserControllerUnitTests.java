@@ -24,6 +24,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -101,9 +102,9 @@ public class UserControllerUnitTests {
     @Test
     void confirmUserRegistrationShouldSucceed() {
         Mockito.doNothing().when(userService).confirmUserRegistration(any());
-        ResponseEntity<Void> result = userController.confirmUserRegistration("token");
+        RedirectView result = userController.confirmUserRegistration("token");
 
-        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertEquals("null/login", result.getUrl());
     }
 
     @Test

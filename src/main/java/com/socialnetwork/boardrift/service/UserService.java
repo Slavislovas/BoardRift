@@ -256,6 +256,7 @@ public class UserService {
                         .stream()
                         .filter(friend -> friend.getName().concat(" " + friend.getLastname()).toLowerCase().contains(query.toLowerCase()))
                         .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet()));
+
         return friends;
     }
 

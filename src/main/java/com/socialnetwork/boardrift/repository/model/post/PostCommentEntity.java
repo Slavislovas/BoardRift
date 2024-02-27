@@ -39,14 +39,6 @@ public class PostCommentEntity {
     private SimplePostEntity simplePost;
 
     @ManyToOne
-    @JoinColumn(name = "id_played_game_post")
-    private PlayedGamePostEntity playedGamePost;
-
-    @ManyToOne
-    @JoinColumn(name = "id_marketplace_post")
-    private MarketplacePostEntity marketplacePost;
-
-    @ManyToOne
     @JoinColumn(name = "id_comment_creator")
     private UserEntity commentCreator;
 }

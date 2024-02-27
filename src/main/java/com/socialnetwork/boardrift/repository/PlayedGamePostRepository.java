@@ -8,15 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public interface PlayedGamePostRepository extends JpaRepository<PlayedGamePostEntity, Long> {
     @Query("SELECT ps FROM PlayedGamePostEntity ps " +
-            "WHERE ps.postCreator = :postCreator " +
-            "OR ps.postCreator IN (SELECT f FROM UserEntity u JOIN u.friends f WHERE u = :postCreator) " +
-            "OR ps.postCreator IN (SELECT f FROM UserEntity u JOIN u.friendOf f WHERE u = :postCreator)")
+            "WHERE ps.basePost.postCreator = :postCreator " +
+            "OR ps.basePost.postCreator IN (SELECT f FROM UserEntity u JOIN u.friends f WHERE u = :postCreator) " +
+            "OR ps.basePost.postCreator IN (SELECT f FROM UserEntity u JOIN u.friendOf f WHERE u = :postCreator)")
     List<PlayedGamePostEntity> findAllByPostCreatorOrFriends(@Param("postCreator") UserEntity userEntity, PageRequest pageRequest);
 }

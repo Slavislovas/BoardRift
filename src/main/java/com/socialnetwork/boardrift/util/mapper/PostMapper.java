@@ -17,15 +17,23 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserMapper.class})
 public interface PostMapper {
-    @Mapping(target = "likes", expression = "java(entity.getLikes().size())")
-    @Mapping(target = "comments", expression = "java(entity.getComments().size())")
+    @Mapping(target = "likes", expression = "java(entity.getBasePost().getLikes().size())")
+    @Mapping(target = "comments", expression = "java(entity.getBasePost().getComments().size())")
+    @Mapping(target = "description", expression = "java(entity.getBasePost().getDescription())")
+    @Mapping(target = "creationDate", expression = "java(entity.getBasePost().getCreationDate())")
+    @Mapping(target = "postCreator", expression = "java(userMapper.entityToMinimalRetrievalDto(entity.getBasePost().getPostCreator()))")
     PlayedGamePostRetrievalDto playedGamePostEntityToRetrievalDto(PlayedGamePostEntity entity);
 
     @Mapping(target = "likes", expression = "java(entity.getLikes().size())")
     @Mapping(target = "comments", expression = "java(entity.getComments().size())")
     SimplePostRetrievalDto simplePostEntityToRetrievalDto(SimplePostEntity entity);
 
+    @Mapping(target = "likes", expression = "java(entity.getBasePost().getLikes().size())")
+    @Mapping(target = "comments", expression = "java(entity.getBasePost().getComments().size())")
+    @Mapping(target = "description", expression = "java(entity.getBasePost().getDescription())")
+    @Mapping(target = "creationDate", expression = "java(entity.getBasePost().getCreationDate())")
     @Mapping(target = "options", qualifiedByName = "pollOptionEntityToRetrievalDto")
+    @Mapping(target = "postCreator", expression = "java(userMapper.entityToMinimalRetrievalDto(entity.getBasePost().getPostCreator()))")
     PollPostRetrievalDto pollPostEntityToRetrievalDto(PollPostEntity entity);
 
     @Mapping(target = "votes", expression = "java(entity.getVotes().size())")

@@ -1,6 +1,5 @@
 package com.socialnetwork.boardrift.repository.model.post;
 
-import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,8 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +18,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -44,12 +41,6 @@ public class PlayedGamePostEntity implements Post{
     @Column(name = "game_picture_url")
     private String gamePictureUrl;
 
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "creation_date")
-    private Date creationDate;
-
     @Column(name = "highest_score")
     private Integer highestScore;
 
@@ -62,9 +53,9 @@ public class PlayedGamePostEntity implements Post{
     @Column(name = "scoring_system")
     private String scoringSystem;
 
-    @ManyToOne
-    @JoinColumn(name = "id_post_creator")
-    private UserEntity postCreator;
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "id_simple_post")
+    private SimplePostEntity basePost;
 
     @ManyToMany(cascade = {CascadeType.PERSIST})
     @JoinTable(
@@ -74,13 +65,8 @@ public class PlayedGamePostEntity implements Post{
     )
     private Set<PlayedGameEntity> plays;
 
-    @OneToMany(mappedBy = "playedGamePost", cascade = {CascadeType.ALL})
-    private List<PostCommentEntity> comments;
-
-    @OneToMany(mappedBy = "playedGamePost", cascade = {CascadeType.ALL})
-    private Set<PostLikeEntity> likes;
-
-    public void addComment(PostCommentEntity playedGamePostCommentEntity) {
-        comments.add(playedGamePostCommentEntity);
+    @Override
+    public Date getCreationDate() {
+        return basePost.getCreationDate();
     }
 }

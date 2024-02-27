@@ -33,12 +33,4 @@ public class PostLikeEntity {
     @ManyToOne
     @JoinColumn(name = "id_simple_post")
     private SimplePostEntity simplePost;
-
-    @ManyToOne
-    @JoinColumn(name = "id_played_game_post")
-    private PlayedGamePostEntity playedGamePost;
-
-    @ManyToOne
-    @JoinColumn(name = "id_marketplace_post")
-    private MarketplacePostEntity marketplacePost;
 }

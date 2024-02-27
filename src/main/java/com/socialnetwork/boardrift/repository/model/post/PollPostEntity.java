@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,18 +32,12 @@ public class PollPostEntity implements Post {
     @Column(name = "id_poll_post")
     private Long id;
 
-    @Column(name = "question")
-    private String question;
-
-    @Column(name = "creation_date")
-    private Date creationDate;
-
-    @ManyToOne
-    @JoinColumn(name = "id_post_creator")
-    private UserEntity postCreator;
-
     @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
     private Set<PollOptionEntity> options;
+
+    @OneToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "id_simple_post")
+    private SimplePostEntity basePost;
 
     public void addVoteByOptionId(Long optionId, UserEntity voterEntity) {
         for (PollOptionEntity pollOption : options) {
@@ -50,5 +45,10 @@ public class PollPostEntity implements Post {
                 pollOption.addVote(voterEntity);
             }
         }
+    }
+
+    @Override
+    public Date getCreationDate() {
+        return basePost.getCreationDate();
     }
 }

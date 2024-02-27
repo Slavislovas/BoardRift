@@ -1,6 +1,5 @@
 package com.socialnetwork.boardrift.rest.controller;
 
-import com.socialnetwork.boardrift.repository.model.post.Post;
 import com.socialnetwork.boardrift.rest.model.post.FeedPageDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
@@ -25,8 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RequestMapping("/posts")
 @RequiredArgsConstructor

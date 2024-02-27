@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface PostCommentRepository extends JpaRepository<PostCommentEntity, Long> {
     List<PostCommentEntity> findAllBySimplePostId(Long id, Pageable pageable);
-    List<PostCommentEntity> findAllByPlayedGamePostId(Long id, Pageable pageable);
 }

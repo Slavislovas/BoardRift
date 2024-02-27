@@ -52,8 +52,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -250,7 +252,7 @@ public class PostServiceUnitTests {
         SimplePostEntity simplePostEntity = new SimplePostEntity();
         when(simplePostRepository.findById(postId)).thenReturn(java.util.Optional.of(simplePostEntity));
 
-        PostCommentEntity savedPostCommentEntity = new PostCommentEntity(1L, commentDto.getText(), null, simplePostEntity, null, null, userEntity);
+        PostCommentEntity savedPostCommentEntity = new PostCommentEntity(1L, commentDto.getText(), null, simplePostEntity, userEntity);
         when(postCommentRepository.save(any())).thenReturn(savedPostCommentEntity);
 
         PostCommentDto expectedCommentDto = new PostCommentDto();
@@ -279,7 +281,7 @@ public class PostServiceUnitTests {
         PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity();
         when(playedGamePostRepository.findById(postId)).thenReturn(java.util.Optional.of(playedGamePostEntity));
 
-        PostCommentEntity savedPostCommentEntity = new PostCommentEntity(1L, commentDto.getText(), null, null, playedGamePostEntity, null, userEntity);
+        PostCommentEntity savedPostCommentEntity = new PostCommentEntity(1L, commentDto.getText(), Instant.now(), playedGamePostEntity.getBasePost(), userEntity);
         when(postCommentRepository.save(any())).thenReturn(savedPostCommentEntity);
 
         PostCommentDto expectedCommentDto = new PostCommentDto();
@@ -290,6 +292,35 @@ public class PostServiceUnitTests {
 
         assertEquals(expectedCommentDto, result);
         verify(playedGamePostRepository, times(1)).findById(postId);
+        verify(postCommentRepository, times(1)).save(any());
+    }
+
+    @Test
+    void createPostComment_WithPollPost_ShouldCreateComment() {
+        String postType = "poll";
+        Long postId = 1L;
+        PostCommentDto commentDto = new PostCommentDto();
+
+        UserDetails userDetails = new UserEntity();
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUsername(userDetails.getUsername());
+
+        when(userService.getUserEntityByUsername(userDetails.getUsername())).thenReturn(userEntity);
+
+        PollPostEntity pollPostEntity = new PollPostEntity();
+        when(pollPostRepository.findById(postId)).thenReturn(java.util.Optional.of(pollPostEntity));
+
+        PostCommentEntity savedPostCommentEntity = new PostCommentEntity(1L, commentDto.getText(), Instant.now(), pollPostEntity.getBasePost(), userEntity);
+        when(postCommentRepository.save(any())).thenReturn(savedPostCommentEntity);
+
+        PostCommentDto expectedCommentDto = new PostCommentDto();
+
+        when(postMapper.postCommentEntityToDto(any())).thenReturn(expectedCommentDto);
+
+        PostCommentDto result = postService.createPostComment(postType, postId, commentDto);
+
+        assertEquals(expectedCommentDto, result);
+        verify(pollPostRepository, times(1)).findById(postId);
         verify(postCommentRepository, times(1)).save(any());
     }
 
@@ -350,7 +381,7 @@ public class PostServiceUnitTests {
 
     @ParameterizedTest
     @MethodSource("providePostTypeAndPageSize")
-    void getPostComments_ShouldReturnPageDto_WithDifferentPostTypesAndPageSizes(String postType, int pageSize) {
+    void getPostComments_ShouldReturnPageDto(String postType, int pageSize) {
         Long postId = 1L;
         Integer page = 1;
         HttpServletRequest request = new MockHttpServletRequest();
@@ -363,8 +394,23 @@ public class PostServiceUnitTests {
 
         List<PostCommentEntity> commentEntities = List.of(postCommentEntity, postCommentEntity2);
 
+        SimplePostEntity simplePost  = new SimplePostEntity(1L, "description", new Date(), new UserEntity(), commentEntities, new HashSet<>(), null, null, null);
+
+        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId, 2L,
+                "CATAN",
+                "pictureUrl",
+                100, 20, 50.0,
+                "lowest-score",
+                simplePost,
+                new HashSet<>());
+
+        PollPostEntity pollPost = new PollPostEntity(1L, new HashSet<>(), simplePost);
+
         lenient().when(postCommentRepository.findAllBySimplePostId(eq(postId), any(PageRequest.class))).thenReturn(commentEntities);
-        lenient().when(postCommentRepository.findAllByPlayedGamePostId(eq(postId), any(PageRequest.class))).thenReturn(commentEntities);
+        lenient().when(playedGamePostRepository.findById(any())).thenReturn(Optional.of(playedGamePostEntity));
+        lenient().when(simplePostRepository.findById(any())).thenReturn(Optional.of(simplePost));
+        lenient().when(pollPostRepository.findById(any())).thenReturn(Optional.of(pollPost));
+
 
         PostCommentDto postCommentDto = new PostCommentDto();
         postCommentDto.setText("FirstText");
@@ -383,20 +429,16 @@ public class PostServiceUnitTests {
             assertNotNull(result);
             assertEquals(List.of(postCommentDto, postCommentDto2), result.getComments());
 
-            if ("simple".equals(postType)) {
-                verify(postCommentRepository, times(1)).findAllBySimplePostId(eq(postId), any(PageRequest.class));
-                assertEquals("null?page=2&pageSize=2", result.getNextPageUrl());
-            } else if ("played-game".equals(postType)) {
-                assertNull(result.getNextPageUrl());
-                verify(postCommentRepository, times(1)).findAllByPlayedGamePostId(eq(postId), any(PageRequest.class));
-            }
+            verify(postCommentRepository, times(1)).findAllBySimplePostId(eq(postId), any(PageRequest.class));
+            assertEquals("null?page=2&pageSize=2", result.getNextPageUrl());
         }
     }
 
     private static Stream<Arguments> providePostTypeAndPageSize() {
         return Stream.of(
                 Arguments.of("simple", 2),
-                Arguments.of("played-game", 1)
+                Arguments.of("played-game", 2),
+                Arguments.of("poll", 2)
         );
     }
 
@@ -430,6 +472,8 @@ public class PostServiceUnitTests {
         userEntity.setId(1L);
         when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
 
+        when(simplePostRepository.findById(any())).thenReturn(Optional.of(new SimplePostEntity()));
+
         Long postId = 1L;
         when(postLikeRepository.findBySimplePostIdAndLikeOwnerId(postId, userEntity.getId())).thenReturn(Optional.of(new PostLikeEntity()));
 
@@ -446,11 +490,20 @@ public class PostServiceUnitTests {
         when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
 
         Long postId = 1L;
-        when(playedGamePostRepository.findById(postId)).thenReturn(Optional.of(new PlayedGamePostEntity()));
+
+        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId, 2L,
+                "CATAN",
+                "pictureUrl",
+                100, 20, 50.0,
+                "lowest-score",
+                new SimplePostEntity(1L, "description", new Date(), userEntity, new ArrayList<>(), new HashSet<>(), null, null, null),
+                new HashSet<>());
+
+        when(playedGamePostRepository.findById(postId)).thenReturn(Optional.of(playedGamePostEntity));
 
         postService.likePost("played-game", postId);
 
-        verify(postLikeRepository).findByPlayedGamePostIdAndLikeOwnerId(postId, userEntity.getId());
+        verify(postLikeRepository).findBySimplePostIdAndLikeOwnerId(playedGamePostEntity.getBasePost().getId(), userEntity.getId());
         verify(postLikeRepository).save(any(PostLikeEntity.class));
     }
 
@@ -460,11 +513,69 @@ public class PostServiceUnitTests {
         when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
 
         Long postId = 1L;
-        when(postLikeRepository.findByPlayedGamePostIdAndLikeOwnerId(postId, userEntity.getId())).thenReturn(Optional.of(new PostLikeEntity()));
 
+        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId, 2L,
+                "CATAN",
+                "pictureUrl",
+                100, 20, 50.0,
+                "lowest-score",
+                new SimplePostEntity(1L, "description", new Date(), userEntity, new ArrayList<>(), new HashSet<>(), null, null, null),
+                new HashSet<>());
+
+        when(playedGamePostRepository.findById(postId)).thenReturn(Optional.of(playedGamePostEntity));
+        when(postLikeRepository.findBySimplePostIdAndLikeOwnerId(playedGamePostEntity.getBasePost().getId(), userEntity.getId())).thenReturn(Optional.of(new PostLikeEntity()));
         postService.likePost("played-game", postId);
 
-        verify(postLikeRepository).findByPlayedGamePostIdAndLikeOwnerId(postId, userEntity.getId());
+        verify(postLikeRepository).findBySimplePostIdAndLikeOwnerId(playedGamePostEntity.getBasePost().getId(), userEntity.getId());
+        verify(postLikeRepository).delete(any(PostLikeEntity.class));
+    }
+
+    @Test
+    void likePost_PollPost_Success() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+
+        Long postId = 1L;
+
+        PollPostEntity pollPostEntity = new PollPostEntity(postId,
+                new HashSet<>(),
+                new SimplePostEntity(1L, "description",
+                        new Date(), userEntity, new ArrayList<>(),
+                        new HashSet<>(), null,
+                        null, null));
+
+        when(pollPostRepository.findById(postId)).thenReturn(Optional.of(pollPostEntity));
+        when(postLikeRepository.findBySimplePostIdAndLikeOwnerId(any(), any())).thenReturn(Optional.empty());
+        when(postLikeRepository.save(any())).thenReturn(new PostLikeEntity());
+
+        postService.likePost("poll", postId);
+
+        verify(postLikeRepository).findBySimplePostIdAndLikeOwnerId(pollPostEntity.getBasePost().getId(), userEntity.getId());
+        verify(postLikeRepository).save(any(PostLikeEntity.class));
+    }
+
+    @Test
+    void likePost_PollPost_Unlike_Success() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+
+        Long postId = 1L;
+
+        PollPostEntity pollPostEntity = new PollPostEntity(postId,
+                new HashSet<>(),
+                new SimplePostEntity(1L, "description",
+                        new Date(), userEntity, new ArrayList<>(),
+                        new HashSet<>(), null,
+                        null, null));
+
+        when(pollPostRepository.findById(postId)).thenReturn(Optional.of(pollPostEntity));
+        when(postLikeRepository.findBySimplePostIdAndLikeOwnerId(any(), any())).thenReturn(Optional.of(new PostLikeEntity()));
+
+        postService.likePost("poll", postId);
+
+        verify(postLikeRepository).findBySimplePostIdAndLikeOwnerId(pollPostEntity.getBasePost().getId(), userEntity.getId());
         verify(postLikeRepository).delete(any(PostLikeEntity.class));
     }
 

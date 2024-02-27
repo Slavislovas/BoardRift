@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public interface PollPostRepository extends JpaRepository<PollPostEntity, Long> {
     @Query("SELECT pp FROM PollPostEntity pp " +
-            "WHERE pp.postCreator = :postCreator " +
-            "OR pp.postCreator IN (SELECT f FROM UserEntity u JOIN u.friends f WHERE u = :postCreator) " +
-            "OR pp.postCreator IN (SELECT f FROM UserEntity u JOIN u.friendOf f WHERE u = :postCreator)")
+            "WHERE pp.basePost.postCreator = :postCreator " +
+            "OR pp.basePost.postCreator IN (SELECT f FROM UserEntity u JOIN u.friends f WHERE u = :postCreator) " +
+            "OR pp.basePost.postCreator IN (SELECT f FROM UserEntity u JOIN u.friendOf f WHERE u = :postCreator)")
     List<PollPostEntity> findAllByPostCreatorOrFriends(@Param("postCreator") UserEntity userEntity, PageRequest pageRequest);
 }

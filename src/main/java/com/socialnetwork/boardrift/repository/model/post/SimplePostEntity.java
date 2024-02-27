@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +26,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "posts")
+@Table(name = "simple_posts")
 public class SimplePostEntity implements Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,7 +49,12 @@ public class SimplePostEntity implements Post {
     @OneToMany(mappedBy = "simplePost", cascade = {CascadeType.ALL})
     private Set<PostLikeEntity> likes;
 
-    public void addComment(PostCommentEntity simplePostCommentEntity) {
-        comments.add(simplePostCommentEntity);
-    }
+    @OneToOne(mappedBy = "basePost", cascade = {CascadeType.ALL})
+    private PlayedGamePostEntity childPlayedGamePost;
+
+    @OneToOne(mappedBy = "basePost", cascade = {CascadeType.ALL})
+    private MarketplacePostEntity childMarketplacePost;
+
+    @OneToOne(mappedBy = "basePost", cascade = {CascadeType.ALL})
+    private PollPostEntity childPollPost;
 }
