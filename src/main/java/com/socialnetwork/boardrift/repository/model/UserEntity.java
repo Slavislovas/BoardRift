@@ -24,7 +24,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +48,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "dateOfBirth")
+    @Column(name = "date_of_birth")
     private String dateOfBirth;
 
     @Column(name = "username")
@@ -58,13 +57,16 @@ public class UserEntity implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "publicProfile")
-    private Boolean publicProfile = true;
+    @Column(name = "public_posts")
+    private Boolean publicPosts = true;
 
-    @Column(name = "publicFriendsList")
+    @Column(name = "public_friends_list")
     private Boolean publicFriendsList = false;
 
-    @Column(name = "profilePictureUrl")
+    @Column(name = "public_plays")
+    private Boolean publicPlays = false;
+
+    @Column(name = "profile_picture_url")
     private String profilePictureUrl = "defaultUserProfilePicture.jpg";
 
     @Column(name = "role")

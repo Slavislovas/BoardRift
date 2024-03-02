@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FeedPageDto {
+public class PostPageDto {
     String nextPageUrl;
     List<Post> posts;
 }

@@ -53,7 +53,7 @@ public class UserControllerUnitTests {
     @BeforeEach
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
-                "2001-11-16", "Username", "Password@123", true, false, "",
+                "2001-11-16", "Username", "Password@123", true, false, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET);
 
@@ -61,7 +61,7 @@ public class UserControllerUnitTests {
                 "email@gmail.com", "2001-11-16",
                 "Username", "Password@123");
 
-        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "");
+        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", false, false, false, false, false, false, false);
         userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
         friendRequestDto = new FriendRequestDto(userRetrievalMinimalDto, userRetrievalMinimalDto);
     }

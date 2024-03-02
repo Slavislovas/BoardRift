@@ -17,4 +17,11 @@ public class UserRetrievalDto {
     private String dateOfBirth;
     private String username;
     private String profilePictureUrl;
+    private Boolean publicPosts;
+    private Boolean publicFriendsList;
+    private Boolean publicPlays;
+    private Boolean userAlreadyFriend;
+    private Boolean friendRequestAlreadySent;
+    private Boolean alreadyReceivedFriendRequest;
+    private Boolean personalData;
 }

@@ -2,7 +2,7 @@ package com.socialnetwork.boardrift.repository;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.repository.model.post.PlayedGamePostEntity;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +16,7 @@ public interface PlayedGamePostRepository extends JpaRepository<PlayedGamePostEn
             "WHERE ps.basePost.postCreator = :postCreator " +
             "OR ps.basePost.postCreator IN (SELECT f FROM UserEntity u JOIN u.friends f WHERE u = :postCreator) " +
             "OR ps.basePost.postCreator IN (SELECT f FROM UserEntity u JOIN u.friendOf f WHERE u = :postCreator)")
-    List<PlayedGamePostEntity> findAllByPostCreatorOrFriends(@Param("postCreator") UserEntity userEntity, PageRequest pageRequest);
+    List<PlayedGamePostEntity> findAllByPostCreatorOrFriends(@Param("postCreator") UserEntity userEntity, Pageable pageable);
+
+    List<PlayedGamePostEntity> findByBasePostPostCreatorId(Long userId, Pageable pageable);
 }

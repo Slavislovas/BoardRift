@@ -1,5 +1,6 @@
 package com.socialnetwork.boardrift.service;
 
+import com.socialnetwork.boardrift.enumeration.Role;
 import com.socialnetwork.boardrift.repository.PlayedGamePostRepository;
 import com.socialnetwork.boardrift.repository.PlayedGameRepository;
 import com.socialnetwork.boardrift.repository.PollPostRepository;
@@ -16,9 +17,10 @@ import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.post.PostLikeEntity;
 import com.socialnetwork.boardrift.repository.model.post.SimplePostEntity;
 import com.socialnetwork.boardrift.rest.model.BGGThingResponse;
-import com.socialnetwork.boardrift.rest.model.post.FeedPageDto;
+import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
+import com.socialnetwork.boardrift.rest.model.post.PostPageDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostCreationDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.post.poll_post.PollOptionDto;
@@ -46,7 +48,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostCreationDto.SelectedPlayerDto;
@@ -68,8 +69,6 @@ public class PostService {
         UserDetails postCreatorDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity postCreatorEntity = userService.getUserEntityByUsername(postCreatorDetails.getUsername());
 
-        playedGamePostCreationDto.addPlayer(new SelectedPlayerDto(postCreatorEntity.getId(), postCreatorEntity.getName(), postCreatorEntity.getLastname(), playedGamePostCreationDto.getPostCreatorWon(), playedGamePostCreationDto.getPostCreatorPoints()));
-
         BGGThingResponse boardGameResponse = boardGameService.getBoardGameById(playedGamePostCreationDto.getPlayedGameId());
 
         PlayedGamePostEntity playedGamePostEntity = switch (playedGamePostCreationDto.getScoringSystem()) {
@@ -89,22 +88,25 @@ public class PostService {
 
 
     private PlayedGamePostEntity createNoScorePlayedGamePost(PlayedGamePostCreationDto playedGamePostCreationDto, UserEntity postCreatorEntity, BGGThingResponse boardGame) {
-        Set<PlayedGameEntity> plays = new HashSet<>();
+        PlayedGameEntity postCreatorPlayedGameEntity = new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
+                0, playedGamePostCreationDto.getPostCreatorWon(),
+                "no-score", new Date(), postCreatorEntity, null, new HashSet<>());
 
         for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
             UserEntity playerUserEntity = userService.getUserEntityById(player.getId());
-            PlayedGameEntity playedGameEntity = playedGameRepository.save(new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(), 0, player.getWon(), "no-score", playerUserEntity));
-
-            playerUserEntity.addPlayedGame(playedGameEntity);
-            plays.add(playedGameEntity);
+            postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
+                    0, player.getWon(), "no-score", new Date(),
+                    playerUserEntity, null, new HashSet<>()));
         }
+
+        postCreatorPlayedGameEntity = playedGameRepository.save(postCreatorPlayedGameEntity);
 
         SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, null);
 
         return new PlayedGamePostEntity(null, playedGamePostCreationDto.getPlayedGameId(),
                 boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(),
                 0, 0, 0.0, "no-score",
-                basePost, plays);
+                basePost, postCreatorPlayedGameEntity);
     }
 
     private PlayedGamePostEntity createLowestScorePlayedGamePost(PlayedGamePostCreationDto playedGamePostCreationDto, UserEntity postCreatorEntity, BGGThingResponse boardGame) {
@@ -112,24 +114,25 @@ public class PostService {
         int max = calculateHighestScore(playedGamePostCreationDto);
         Double average = calculateAverageScore(playedGamePostCreationDto);
 
-        Set<PlayedGameEntity> plays = new HashSet<>();
+        PlayedGameEntity postCreatorPlayedGameEntity = new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
+                playedGamePostCreationDto.getPostCreatorPoints(), playedGamePostCreationDto.getPostCreatorPoints().equals(min),
+                "lowest-score", new Date(), postCreatorEntity, null, new HashSet<>());
 
         for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
             UserEntity playerUserEntity = userService.getUserEntityById(player.getId());
-
-            player.setWon(player.getPoints().equals(min));
-
-            PlayedGameEntity playedGameEntity = playedGameRepository.save(new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(), player.getPoints(), player.getWon(), "lowest-score", playerUserEntity));
-            playerUserEntity.addPlayedGame(playedGameEntity);
-            plays.add(playedGameEntity);
+            postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
+                    player.getPoints(), player.getPoints().equals(min), "lowest-score", new Date(),
+                    playerUserEntity, null, new HashSet<>()));
         }
+
+        postCreatorPlayedGameEntity = playedGameRepository.save(postCreatorPlayedGameEntity);
 
         SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, null);
 
         return new PlayedGamePostEntity(null, playedGamePostCreationDto.getPlayedGameId(),
                 boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(),
                 max, min, average, "lowest-score",
-                basePost, plays);
+                basePost, postCreatorPlayedGameEntity);
     }
 
     private PlayedGamePostEntity createHighestScorePlayedGamePost(PlayedGamePostCreationDto playedGamePostCreationDto, UserEntity postCreatorEntity, BGGThingResponse boardGame) {
@@ -137,50 +140,60 @@ public class PostService {
         int max = calculateHighestScore(playedGamePostCreationDto);
         Double average = calculateAverageScore(playedGamePostCreationDto);
 
-        Set<PlayedGameEntity> plays = new HashSet<>();
+        PlayedGameEntity postCreatorPlayedGameEntity = new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
+                playedGamePostCreationDto.getPostCreatorPoints(), playedGamePostCreationDto.getPostCreatorPoints().equals(max),
+                "highest-score", new Date(), postCreatorEntity, null, new HashSet<>());
 
         for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
             UserEntity playerUserEntity = userService.getUserEntityById(player.getId());
-
-            player.setWon(player.getPoints().equals(max));
-
-            PlayedGameEntity playedGameEntity = playedGameRepository.save(new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(), player.getPoints(), player.getWon(), "lowest-score", playerUserEntity));
-            playerUserEntity.addPlayedGame(playedGameEntity);
-            plays.add(playedGameEntity);
+            postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
+                    player.getPoints(), player.getPoints().equals(max), "highest-score", new Date(),
+                    playerUserEntity, null, new HashSet<>()));
         }
+
+        postCreatorPlayedGameEntity = playedGameRepository.save(postCreatorPlayedGameEntity);
 
         SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, null);
 
         return new PlayedGamePostEntity(null, playedGamePostCreationDto.getPlayedGameId(),
                 boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(),
                 max, min, average, "highest-score",
-                basePost, plays);
+                basePost, postCreatorPlayedGameEntity);
     }
 
 
     private Double calculateAverageScore(PlayedGamePostCreationDto playedGamePostCreationDto) {
-        return playedGamePostCreationDto.getPlayers().stream()
-                .mapToDouble(player -> player.getPoints() != null ? player.getPoints() : -1.0)
-                .average()
-                .orElse(-1.0);
+        Double average = playedGamePostCreationDto.getPostCreatorPoints().doubleValue();
+
+        for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
+           average += player.getPoints().doubleValue();
+        }
+
+        return average / (playedGamePostCreationDto.getPlayers().size() + 1);
     }
 
     private Integer calculateLowestScore(PlayedGamePostCreationDto playedGamePostCreationDto) {
-        return playedGamePostCreationDto.getPlayers().stream()
-                .map(SelectedPlayerDto::getPoints)
-                .filter(Objects::nonNull)
-                .mapToInt(Integer::intValue)
-                .min()
-                .orElse(-1);
+        Integer min = playedGamePostCreationDto.getPostCreatorPoints();
+
+        for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
+            if (player.getPoints() < min) {
+                min = player.getPoints();
+            }
+        }
+
+        return min;
     }
 
     private Integer calculateHighestScore(PlayedGamePostCreationDto playedGamePostCreationDto) {
-        return playedGamePostCreationDto.getPlayers().stream()
-                .map(SelectedPlayerDto::getPoints)
-                .filter(Objects::nonNull)
-                .mapToInt(Integer::intValue)
-                .max()
-                .orElse(-1);
+        Integer max = playedGamePostCreationDto.getPostCreatorPoints();
+
+        for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
+            if (player.getPoints() > max) {
+                max = player.getPoints();
+            }
+        }
+
+        return max;
     }
 
     public SimplePostRetrievalDto createSimplePost(SimplePostCreationDto simplePostCreationDto) {
@@ -222,7 +235,7 @@ public class PostService {
 
         PollPostEntity pollPost = pollPostRepository.findById(pollId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + pollId + " was not found"));
 
-        if (userAlreadyVoted(pollPost, voterEntity)) {
+        if (userAlreadyVoted(pollPost, voterEntity.getId())) {
             throw new DuplicatePollVoteException("User with id: " + voterEntity.getId() + " has already voted on this poll");
         }
 
@@ -231,12 +244,12 @@ public class PostService {
         pollPostRepository.save(pollPost);
     }
 
-    private boolean userAlreadyVoted(PollPostEntity pollPost, UserEntity voterEntity) {
+    private boolean userAlreadyVoted(PollPostEntity pollPost, Long voterId) {
         return pollPost.getOptions()
                 .stream()
                 .anyMatch(option -> option.getVotes()
                         .stream()
-                        .anyMatch(vote -> vote.getVoter().getId().equals(voterEntity.getId())));
+                        .anyMatch(vote -> vote.getVoter().getId().equals(voterId)));
     }
 
     public PostCommentDto createPostComment(String postType, Long postId, PostCommentDto commentDto) {
@@ -410,7 +423,7 @@ public class PostService {
                 );
     }
 
-    public FeedPageDto getFeed(Integer page, Integer pageSize, HttpServletRequest request) {
+    public PostPageDto getFeed(Integer page, Integer pageSize, HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity userEntity = userService.getUserEntityByUsername(userDetails.getUsername());
 
@@ -427,7 +440,7 @@ public class PostService {
         posts.sort((post1, post2) -> post2.getCreationDate().compareTo(post1.getCreationDate()));
 
         if (posts.size() > pageSize) {
-            posts = posts.subList(0, 20);
+            posts = posts.subList(0, pageSize);
         }
 
         String nexPageUrl = posts.size() == pageSize ? String.format("%s%s?page=%d&pageSize=%d",
@@ -436,69 +449,144 @@ public class PostService {
                 page + 1,
                 pageSize) : null;
 
-        return new FeedPageDto(nexPageUrl, posts);
+        return new PostPageDto(nexPageUrl, posts);
     }
 
     private List<PollPostRetrievalDto> retrieveFeedPollPosts(UserEntity userEntity, Integer page, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
 
         return pollPostRepository.findAllByPostCreatorOrFriends(userEntity, pageRequest)
-                .stream().map(pollPostEntity -> {
-                    PollPostRetrievalDto pollPostRetrievalDto = postMapper.pollPostEntityToRetrievalDto(pollPostEntity);
-
-                    if (userAlreadyVoted(pollPostEntity, userEntity)) {
-                        pollPostRetrievalDto.setAlreadyVoted(true);
-
-                        pollPostRetrievalDto.setSelectedOption(pollPostEntity.getOptions()
-                                .stream()
-                                .filter(pollOptionEntity -> pollOptionEntity.getVotes()
-                                        .stream()
-                                        .anyMatch(pollOptionVoteEntity -> pollOptionVoteEntity.getVoter().getId().equals(userEntity.getId())))
-                                .findFirst()
-                                .map(pollOptionEntity -> new PollOptionRetrievalDto(pollOptionEntity.getId(), pollOptionEntity.getText(), pollOptionEntity.getVotes().size()))
-                                .get());
-                    }
-
-                    pollPostRetrievalDto.setAlreadyLiked(pollPostEntity
-                            .getBasePost()
-                            .getLikes()
-                            .stream()
-                            .anyMatch(postLikeEntity -> postLikeEntity.getLikeOwner().getId().equals(userEntity.getId())));
-
-                    return pollPostRetrievalDto;
-                }).toList();
+                .stream().map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(userEntity.getId(), pollPostEntity)).toList();
     }
 
     private List<PlayedGamePostRetrievalDto> retrieveFeedPlayedGamePosts(UserEntity userEntity, Integer page, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
 
         return playedGamePostRepository.findAllByPostCreatorOrFriends(userEntity, pageRequest)
-                .stream().map(playedGamePostEntity -> {
-                    PlayedGamePostRetrievalDto playedGamePostRetrievalDto = postMapper.playedGamePostEntityToRetrievalDto(playedGamePostEntity);
-
-                    playedGamePostRetrievalDto.setAlreadyLiked(playedGamePostEntity
-                            .getBasePost()
-                            .getLikes()
-                            .stream()
-                            .anyMatch(postLikeEntity -> postLikeEntity.getLikeOwner().getId().equals(userEntity.getId())));
-
-                    return playedGamePostRetrievalDto;
-                }).toList();
+                .stream().map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(userEntity.getId(), playedGamePostEntity)).toList();
     }
 
     private List<SimplePostRetrievalDto> retrieveFeedSimplePosts(UserEntity userEntity, Integer page, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("creationDate").descending());
 
         return simplePostRepository.findAllByPostCreatorOrFriends(userEntity, pageRequest)
-                .stream().map(simplePostEntity -> {
-                    SimplePostRetrievalDto simplePostRetrievalDto = postMapper.simplePostEntityToRetrievalDto(simplePostEntity);
+                .stream().map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(userEntity.getId(), simplePostEntity)).toList();
+    }
 
-                    simplePostRetrievalDto.setAlreadyLiked(simplePostEntity
-                            .getLikes()
+    public PostPageDto getPostsByUserId(Long userId, Integer page, Integer pageSize, HttpServletRequest request) throws IllegalAccessException {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity userEntity = userService.getUserEntityByUsername(userDetails.getUsername());
+
+        if (!userEntity.getRole().equals(Role.ROLE_ADMINISTRATOR)) {
+            if (!userEntity.getId().equals(userId)) {
+                UserRetrievalDto targetUser = userService.getUserById(userId);
+                if (!targetUser.getPublicPosts() && !userAlreadyFriend(userEntity, targetUser.getId())) {
+                    throw new IllegalAccessException("This user's posts are private");
+                }
+            }
+        }
+
+        List<Post> posts = new ArrayList<>();
+
+        posts.addAll(retrieveSimplePostsByUserId(userId, userEntity, page, pageSize));
+        posts.addAll(retrievePollPostsByUserId(userId, userEntity, page, pageSize));
+        posts.addAll(retrievePlayedGamePostsByUserId(userId, userEntity, page, pageSize));
+
+        posts.sort((post1, post2) -> post2.getCreationDate().compareTo(post1.getCreationDate()));
+
+        if (posts.size() > pageSize) {
+            posts = posts.subList(0, pageSize);
+        }
+
+        String nextPageUrl = posts.size() == pageSize ? String.format("%s%s?page=%d&pageSize=%d",
+                ServletUriComponentsBuilder.fromCurrentContextPath().toUriString(),
+                request.getServletPath(),
+                page + 1,
+                pageSize) : null;
+
+        return new PostPageDto(nextPageUrl, posts);
+    }
+
+    private boolean userAlreadyFriend(UserEntity loggedInUserEntity, Long targetUserId) {
+        boolean hasFriend =  loggedInUserEntity
+                .getFriends()
+                .stream()
+                .anyMatch(friend -> friend.getId().equals(targetUserId));
+
+        boolean friendOf = loggedInUserEntity
+                .getFriendOf()
+                .stream()
+                .anyMatch(friend -> friend.getId().equals(targetUserId));
+
+        return hasFriend || friendOf;
+    }
+
+    private List<SimplePostRetrievalDto> retrieveSimplePostsByUserId(Long userId, UserEntity loggedInUser, Integer page, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("creationDate").descending());
+
+        return simplePostRepository.findByPostCreatorId(userId, pageRequest)
+                .stream().map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(loggedInUser.getId(), simplePostEntity)).toList();
+    }
+
+    private List<PollPostRetrievalDto> retrievePollPostsByUserId(Long userId, UserEntity loggedInUser, Integer page, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
+
+        return pollPostRepository.findByBasePostPostCreatorId(userId, pageRequest)
+                .stream().map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(loggedInUser.getId(), pollPostEntity)).toList();
+    }
+
+    private List<PlayedGamePostRetrievalDto> retrievePlayedGamePostsByUserId(Long userId, UserEntity loggedInUser, Integer page, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
+
+        return playedGamePostRepository.findByBasePostPostCreatorId(userId, pageRequest)
+                .stream().map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(loggedInUser.getId(), playedGamePostEntity)).toList();
+    }
+
+    private PlayedGamePostRetrievalDto mapPlayedGamePostEntityToDtoWithAdditionalFields(Long loggedInUserId, PlayedGamePostEntity playedGamePostEntity) {
+        PlayedGamePostRetrievalDto playedGamePostRetrievalDto = postMapper.playedGamePostEntityToRetrievalDto(playedGamePostEntity);
+
+        playedGamePostRetrievalDto.setAlreadyLiked(playedGamePostEntity
+                .getBasePost()
+                .getLikes()
+                .stream()
+                .anyMatch(postLikeEntity -> postLikeEntity.getLikeOwner().getId().equals(loggedInUserId)));
+
+        return playedGamePostRetrievalDto;
+    }
+
+    private SimplePostRetrievalDto mapSimplePostEntityToDtoWithAdditionalFields(Long loggedInUserId, SimplePostEntity simplePostEntity) {
+        SimplePostRetrievalDto simplePostRetrievalDto = postMapper.simplePostEntityToRetrievalDto(simplePostEntity);
+
+        simplePostRetrievalDto.setAlreadyLiked(simplePostEntity
+                .getLikes()
+                .stream()
+                .anyMatch(postLikeEntity -> postLikeEntity.getLikeOwner().getId().equals(loggedInUserId)));
+
+        return simplePostRetrievalDto;
+    }
+
+    private PollPostRetrievalDto mapPollPostEntityToDtoWithAdditionalFields(Long loggedInUserId, PollPostEntity pollPostEntity) {
+        PollPostRetrievalDto pollPostRetrievalDto = postMapper.pollPostEntityToRetrievalDto(pollPostEntity);
+
+        if (userAlreadyVoted(pollPostEntity, loggedInUserId)) {
+            pollPostRetrievalDto.setAlreadyVoted(true);
+
+            pollPostRetrievalDto.setSelectedOption(pollPostEntity.getOptions()
+                    .stream()
+                    .filter(pollOptionEntity -> pollOptionEntity.getVotes()
                             .stream()
-                            .anyMatch(postLikeEntity -> postLikeEntity.getLikeOwner().getId().equals(userEntity.getId())));
+                            .anyMatch(pollOptionVoteEntity -> pollOptionVoteEntity.getVoter().getId().equals(loggedInUserId)))
+                    .findFirst()
+                    .map(pollOptionEntity -> new PollOptionRetrievalDto(pollOptionEntity.getId(), pollOptionEntity.getText(), pollOptionEntity.getVotes().size()))
+                    .get());
+        }
 
-                    return simplePostRetrievalDto;
-                }).toList();
+        pollPostRetrievalDto.setAlreadyLiked(pollPostEntity
+                .getBasePost()
+                .getLikes()
+                .stream()
+                .anyMatch(postLikeEntity -> postLikeEntity.getLikeOwner().getId().equals(loggedInUserId)));
+
+        return pollPostRetrievalDto;
     }
 }

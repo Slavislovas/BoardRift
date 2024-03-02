@@ -1,31 +1,44 @@
 package com.socialnetwork.boardrift.service;
 
 import com.socialnetwork.boardrift.enumeration.Role;
+import com.socialnetwork.boardrift.feign.BGGApiConnection;
+import com.socialnetwork.boardrift.repository.PlayedGameRepository;
 import com.socialnetwork.boardrift.repository.UserRepository;
 import com.socialnetwork.boardrift.repository.model.EmailVerificationTokenEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
+import com.socialnetwork.boardrift.repository.model.post.PlayedGamePostEntity;
+import com.socialnetwork.boardrift.rest.model.BGGThingResponse;
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
+import com.socialnetwork.boardrift.rest.model.PlayedGamePageDto;
 import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.post.PostPageDto;
+import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGameDto;
 import com.socialnetwork.boardrift.util.exception.DuplicateFriendRequestException;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
+import com.socialnetwork.boardrift.util.mapper.PlayedGameMapper;
 import com.socialnetwork.boardrift.util.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,9 +46,12 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PlayedGameRepository playedGameRepository;
     private final UserMapper userMapper;
+    private final PlayedGameMapper playedGameMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final BGGApiConnection bggApiConnection;
 
     public UserEntity getUserEntityById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
@@ -43,10 +59,6 @@ public class UserService {
 
     public UserEntity getUserEntityByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User with username: " + username + " was not found"));
-    }
-
-    public UserEntity saveUserEntity(UserEntity playerEntity) {
-        return userRepository.save(playerEntity);
     }
 
     public UserRetrievalDto createUser(UserRegistrationDto userRegistrationDto, HttpServletRequest servletRequest) {
@@ -58,7 +70,7 @@ public class UserService {
 
         emailService.sendEmailVerification(servletRequest, userEntity);
 
-        return userMapper.entityToRetrievalDto(userEntity);
+        return userMapper.entityToRetrievalDto(userEntity, null, null, null, null);
     }
 
     private void verifyIfUsernameAndEmailIsUnique(String username, String email) {
@@ -203,24 +215,24 @@ public class UserService {
 
     public Set<UserRetrievalMinimalDto> getFriends(Long userId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+        UserEntity loggedInUserEntity = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userDetails.getUsername() + " was not found"));
+        UserEntity targetUserEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userDetails.getUsername() + " was not found"));
 
-        if (!Role.ROLE_ADMINISTRATOR.name().equals(role)) {
-            if (!userEntity.getUsername().equals(userDetails.getUsername())) {
-                if (!userEntity.getPublicFriendsList()) {
+        if (!Role.ROLE_ADMINISTRATOR.name().equals(loggedInUserEntity.getRole().name())) {
+            if (!targetUserEntity.getUsername().equals(userDetails.getUsername())) {
+                if (!targetUserEntity.getPublicFriendsList() && !receiverAlreadyFriend(loggedInUserEntity, targetUserEntity.getId())) {
                     throw new IllegalAccessException("You cannot view this user's friend list");
                 }
             }
         }
 
-        Set<UserRetrievalMinimalDto> friends = userEntity.getFriends()
+        Set<UserRetrievalMinimalDto> friends = targetUserEntity.getFriends()
                 .stream()
                 .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet());
 
         friends.addAll(
-                userEntity.getFriendOf()
+                targetUserEntity.getFriendOf()
                         .stream()
                         .map(userMapper::entityToMinimalRetrievalDto).collect(Collectors.toSet())
         );
@@ -261,7 +273,144 @@ public class UserService {
     }
 
     public UserRetrievalDto getUserById(Long userId) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity loggedInUserEntity = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+
         UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
-        return userMapper.entityToRetrievalDto(userEntity);
+
+        boolean userAlreadyFriend = receiverAlreadyFriend(loggedInUserEntity, userId);
+        boolean friendRequestAlreadySent = friendRequestAlreadySent(loggedInUserEntity, userId);
+        boolean alreadyReceivedFriendRequest = receiverAlreadySentFriendRequest(loggedInUserEntity, userId);
+        boolean personalData = loggedInUserEntity.getId().equals(userEntity.getId());
+
+        return userMapper.entityToRetrievalDto(userEntity, userAlreadyFriend, friendRequestAlreadySent, alreadyReceivedFriendRequest, personalData);
+    }
+
+    public PlayedGamePageDto getPlayedGamesByUserId(Long userId, Integer page, Integer pageSize, HttpServletRequest request) throws IllegalAccessException {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+
+        if (!Role.ROLE_ADMINISTRATOR.name().equals(role)) {
+            if (!userEntity.getUsername().equals(userDetails.getUsername())) {
+                if (!userEntity.getPublicPlays()) {
+                    throw new IllegalAccessException("You cannot view this user's plays");
+                }
+            }
+        }
+
+        PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("creationDate").descending());
+        List<PlayedGameEntity> playedGames = playedGameRepository.findByUserId(userId, pageRequest);
+
+        List<PlayedGameDto> playedGameDtoList = playedGames.stream()
+                .map(playedGame -> {
+                    BGGThingResponse boardGame = bggApiConnection.getBoardGameById(playedGame.getBggGameId());
+                    return playedGameMapper.entityToDto(playedGame, boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage());
+                }).toList();
+
+        String nextPageUrl = playedGameDtoList.size() == pageSize ? String.format("%s%s?page=%d&pageSize=%d",
+                ServletUriComponentsBuilder.fromCurrentContextPath().toUriString(),
+                request.getServletPath(),
+                page + 1,
+                pageSize) : null;
+
+        return new PlayedGamePageDto(nextPageUrl, playedGameDtoList);
+    }
+
+    public PlayedGameDto logPlayedGame(PlayedGameDto playedGameDto) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity loggedInUserEntity = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+
+        PlayedGameEntity playedGameEntity = switch (playedGameDto.getScoringSystem()) {
+            case "highest-score" ->
+                    createHighestScorePlayedGameEntity(playedGameDto, loggedInUserEntity);
+            case "lowest-score" ->
+                    createLowestScorePlayedGameEntity(playedGameDto, loggedInUserEntity);
+            case "no-score" ->
+                    createNoScorePlayedGameEntity(playedGameDto, loggedInUserEntity);
+            default -> throw new FieldValidationException(Map.of("scoringSystem", "Invalid scoring system"));
+        };
+
+        BGGThingResponse boardGame = bggApiConnection.getBoardGameById(playedGameDto.getBggGameId());
+        return playedGameMapper.entityToDto(playedGameEntity, boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage());
+    }
+
+    private PlayedGameEntity createHighestScorePlayedGameEntity(PlayedGameDto playedGameDto, UserEntity loggedInUserEntity) {
+        Integer max = calculateHighestScore(playedGameDto);
+
+        PlayedGameEntity playedGameEntity = new PlayedGameEntity(null, playedGameDto.getBggGameId(), playedGameDto.getScore(),
+                playedGameDto.getScore().equals(max), playedGameDto.getScoringSystem(),
+                new Date(), loggedInUserEntity, null, new HashSet<>());
+
+        for (PlayedGameDto associatedPlayedGameDto : playedGameDto.getAssociatedPlays()) {
+            playedGameEntity.addAssociatedPlay(new PlayedGameEntity(null, playedGameDto.getBggGameId(), associatedPlayedGameDto.getScore(),
+                    associatedPlayedGameDto.getScore().equals(max), playedGameDto.getScoringSystem(),
+                    new Date(), getUserEntityById(associatedPlayedGameDto.getUser().getId()), null, new HashSet<>()));
+        }
+
+        return playedGameRepository.save(playedGameEntity);
+    }
+
+    private Integer calculateHighestScore(PlayedGameDto playedGameDto) {
+        Integer max = playedGameDto.getScore();
+
+        for (PlayedGameDto associatedPlayedGameDto : playedGameDto.getAssociatedPlays()) {
+            if (associatedPlayedGameDto.getScore() > max) {
+                max = associatedPlayedGameDto.getScore();
+            }
+        }
+
+        return max;
+    }
+
+    private PlayedGameEntity createLowestScorePlayedGameEntity(PlayedGameDto playedGameDto, UserEntity loggedInUserEntity) {
+        Integer min = calculateLowestScore(playedGameDto);
+
+        PlayedGameEntity playedGameEntity = new PlayedGameEntity(null, playedGameDto.getBggGameId(), playedGameDto.getScore(),
+                playedGameDto.getScore().equals(min), playedGameDto.getScoringSystem(),
+                new Date(), loggedInUserEntity, null, new HashSet<>());
+
+        for (PlayedGameDto associatedPlayedGameDto : playedGameDto.getAssociatedPlays()) {
+            playedGameEntity.addAssociatedPlay(new PlayedGameEntity(null, playedGameDto.getBggGameId(), associatedPlayedGameDto.getScore(),
+                    associatedPlayedGameDto.getScore().equals(min), playedGameDto.getScoringSystem(),
+                    new Date(), getUserEntityById(associatedPlayedGameDto.getUser().getId()), null, new HashSet<>()));
+        }
+
+        return playedGameRepository.save(playedGameEntity);
+    }
+
+    private Integer calculateLowestScore(PlayedGameDto playedGameDto) {
+        Integer min = playedGameDto.getScore();
+
+        for (PlayedGameDto associatedPlayedGameDto : playedGameDto.getAssociatedPlays()) {
+            if (associatedPlayedGameDto.getScore() < min) {
+                min = associatedPlayedGameDto.getScore();
+            }
+        }
+
+        return min;
+    }
+
+    private PlayedGameEntity createNoScorePlayedGameEntity(PlayedGameDto playedGameDto, UserEntity loggedInUserEntity) {
+        PlayedGameEntity playedGameEntity = new PlayedGameEntity(null, playedGameDto.getBggGameId(), playedGameDto.getScore(),
+                playedGameDto.getWon(), playedGameDto.getScoringSystem(),
+                new Date(), loggedInUserEntity, null, new HashSet<>());
+
+        for (PlayedGameDto associatedPlayedGameDto : playedGameDto.getAssociatedPlays()) {
+            playedGameEntity.addAssociatedPlay(new PlayedGameEntity(null, playedGameDto.getBggGameId(), associatedPlayedGameDto.getScore(),
+                    associatedPlayedGameDto.getWon(), playedGameDto.getScoringSystem(),
+                    new Date(), getUserEntityById(associatedPlayedGameDto.getUser().getId()), null, new HashSet<>()));
+        }
+
+        return playedGameRepository.save(playedGameEntity);
+    }
+
+    @Transactional
+    public void deletePlayedGameById(Long playId) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity loggedInUserEntity = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+
+        playedGameRepository.deleteByIdAndUserId(playId, loggedInUserEntity.getId());
     }
 }

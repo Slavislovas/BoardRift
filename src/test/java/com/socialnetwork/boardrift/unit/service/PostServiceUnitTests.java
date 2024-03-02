@@ -7,6 +7,7 @@ import com.socialnetwork.boardrift.repository.PostCommentRepository;
 import com.socialnetwork.boardrift.repository.PostLikeRepository;
 import com.socialnetwork.boardrift.repository.SimplePostRepository;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
 import com.socialnetwork.boardrift.repository.model.post.PlayedGamePostEntity;
 import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.post.PollOptionEntity;
@@ -402,7 +403,7 @@ public class PostServiceUnitTests {
                 100, 20, 50.0,
                 "lowest-score",
                 simplePost,
-                new HashSet<>());
+                new PlayedGameEntity());
 
         PollPostEntity pollPost = new PollPostEntity(1L, new HashSet<>(), simplePost);
 
@@ -497,7 +498,7 @@ public class PostServiceUnitTests {
                 100, 20, 50.0,
                 "lowest-score",
                 new SimplePostEntity(1L, "description", new Date(), userEntity, new ArrayList<>(), new HashSet<>(), null, null, null),
-                new HashSet<>());
+                new PlayedGameEntity());
 
         when(playedGamePostRepository.findById(postId)).thenReturn(Optional.of(playedGamePostEntity));
 
@@ -520,7 +521,7 @@ public class PostServiceUnitTests {
                 100, 20, 50.0,
                 "lowest-score",
                 new SimplePostEntity(1L, "description", new Date(), userEntity, new ArrayList<>(), new HashSet<>(), null, null, null),
-                new HashSet<>());
+                new PlayedGameEntity());
 
         when(playedGamePostRepository.findById(postId)).thenReturn(Optional.of(playedGamePostEntity));
         when(postLikeRepository.findBySimplePostIdAndLikeOwnerId(playedGamePostEntity.getBasePost().getId(), userEntity.getId())).thenReturn(Optional.of(new PostLikeEntity()));

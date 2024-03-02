@@ -1,9 +1,12 @@
 package com.socialnetwork.boardrift.rest.controller;
 
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
+import com.socialnetwork.boardrift.rest.model.PlayedGamePageDto;
 import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.post.PostPageDto;
+import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGameDto;
 import com.socialnetwork.boardrift.service.UserService;
 import com.socialnetwork.boardrift.util.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,6 +67,14 @@ public class UserController {
         return ResponseEntity.ok(userService.searchFriendsByName(userId, query));
     }
 
+    @GetMapping("/{userId}/plays")
+    public ResponseEntity<PlayedGamePageDto> getPlayedGamesByUserId(@PathVariable("userId") Long userId,
+                                                                    @RequestParam("page") Integer page,
+                                                                    @RequestParam("pageSize") Integer pageSize,
+                                                                    HttpServletRequest request) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.getPlayedGamesByUserId(userId, page, pageSize, request));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<UserRetrievalDto> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto, BindingResult bindingResult, HttpServletRequest servletRequest) {
         RequestValidator.validateRequest(bindingResult);
@@ -80,8 +91,19 @@ public class UserController {
         return ResponseEntity.ok(userService.acceptFriendRequest(senderId));
     }
 
+    @PostMapping("/plays")
+    public ResponseEntity<PlayedGameDto> logPlayedGame(@RequestBody PlayedGameDto playedGameDto) {
+        return new ResponseEntity<>(userService.logPlayedGame(playedGameDto), HttpStatus.CREATED);
+    }
+
     @DeleteMapping("/{senderId}/friend-requests/decline")
     public ResponseEntity<String> declineFriendRequest(@PathVariable("senderId") Long senderId) {
         return ResponseEntity.ok(userService.declineFriendRequest(senderId));
+    }
+
+    @DeleteMapping("/plays/{playId}")
+    public ResponseEntity<Void> deletePlayedGameById(@PathVariable("playId") Long playId) {
+        userService.deletePlayedGameById(playId);
+        return ResponseEntity.ok().build();
     }
 }

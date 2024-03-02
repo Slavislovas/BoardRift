@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public interface SimplePostRepository extends JpaRepository<SimplePostEntity, Long> {
@@ -21,4 +20,11 @@ public interface SimplePostRepository extends JpaRepository<SimplePostEntity, Lo
             "AND sp.childMarketplacePost IS NULL " +
             "AND sp.childPollPost IS NULL")
     List<SimplePostEntity> findAllByPostCreatorOrFriends(@Param("postCreator") UserEntity postCreator, Pageable pageable);
+
+    @Query("SELECT sp FROM SimplePostEntity sp " +
+            "WHERE (sp.postCreator.id = :postCreatorId)" +
+            "AND sp.childPlayedGamePost IS NULL " +
+            "AND sp.childMarketplacePost IS NULL " +
+            "AND sp.childPollPost IS NULL")
+    List<SimplePostEntity> findByPostCreatorId(@Param("postCreatorId") Long userId, Pageable pageable);
 }

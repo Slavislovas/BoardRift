@@ -57,13 +57,9 @@ public class PlayedGamePostEntity implements Post{
     @JoinColumn(name = "id_simple_post")
     private SimplePostEntity basePost;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST})
-    @JoinTable(
-            name = "posted_plays",
-            joinColumns = @JoinColumn(name = "id_played_game_post"),
-            inverseJoinColumns = @JoinColumn(name = "id_posted_play")
-    )
-    private Set<PlayedGameEntity> plays;
+    @OneToOne
+    @JoinColumn(name = "play")
+    private PlayedGameEntity playedGame;
 
     @Override
     public Date getCreationDate() {
