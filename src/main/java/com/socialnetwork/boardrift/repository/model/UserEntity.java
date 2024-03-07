@@ -18,6 +18,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -57,6 +58,15 @@ public class UserEntity implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "bio")
+    private String bio;
+
+    @Column(name = "country")
+    private String country = "";
+
+    @Column(name = "city")
+    private String city = "";
+
     @Column(name = "public_posts")
     private Boolean publicPosts = true;
 
@@ -67,7 +77,7 @@ public class UserEntity implements UserDetails {
     private Boolean publicPlays = false;
 
     @Column(name = "profile_picture_url")
-    private String profilePictureUrl = "defaultUserProfilePicture.jpg";
+    private String profilePictureUrl;
 
     @Column(name = "role")
     private Role role = Role.ROLE_USER;

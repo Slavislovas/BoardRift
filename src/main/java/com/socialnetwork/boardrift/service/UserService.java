@@ -7,14 +7,13 @@ import com.socialnetwork.boardrift.repository.UserRepository;
 import com.socialnetwork.boardrift.repository.model.EmailVerificationTokenEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
-import com.socialnetwork.boardrift.repository.model.post.PlayedGamePostEntity;
 import com.socialnetwork.boardrift.rest.model.BGGThingResponse;
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
 import com.socialnetwork.boardrift.rest.model.PlayedGamePageDto;
-import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
-import com.socialnetwork.boardrift.rest.model.post.PostPageDto;
+import com.socialnetwork.boardrift.rest.model.user.UserEditDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGameDto;
 import com.socialnetwork.boardrift.util.exception.DuplicateFriendRequestException;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
@@ -23,6 +22,7 @@ import com.socialnetwork.boardrift.util.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,9 +30,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +52,12 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final BGGApiConnection bggApiConnection;
+    private final AWSService awsService;
+
+    @Value("${aws.s3.default-profile-picture-url}")
+    private String defaultUserProfilePictureUrl;
+
+    private static final long MAX_PROFILE_PICTURE_SIZE_BYTES = 2 * 1024 * 1024;
 
     public UserEntity getUserEntityById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
@@ -66,6 +72,10 @@ public class UserService {
 
         UserEntity userEntity = userMapper.registrationDtoToEntity(userRegistrationDto);
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setBio("");
+        userEntity.setProfilePictureUrl(defaultUserProfilePictureUrl);
+        userEntity.setCity("");
+        userEntity.setCountry("");
         userEntity = userRepository.save(userEntity);
 
         emailService.sendEmailVerification(servletRequest, userEntity);
@@ -412,5 +422,43 @@ public class UserService {
         UserEntity loggedInUserEntity = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
         playedGameRepository.deleteByIdAndUserId(playId, loggedInUserEntity.getId());
+    }
+
+    public UserRetrievalDto editUserById(Long userId, MultipartFile profilePicture, UserEditDto userEditDto) throws IllegalAccessException {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
+
+        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+
+        if (!Role.ROLE_ADMINISTRATOR.name().equals(role)) {
+            if (!userEntity.getUsername().equals(userDetails.getUsername())) {
+                throw new IllegalAccessException("You cannot edit another users data");
+            }
+        }
+
+        userEntity.setName(userEditDto.getName());
+        userEntity.setLastname(userEditDto.getLastname());
+        userEntity.setBio(userEditDto.getBio());
+        userEntity.setCountry(userEditDto.getCountry());
+        userEntity.setCity(userEditDto.getCity());
+        userEntity.setPublicPosts(userEditDto.getPublicPosts());
+        userEntity.setPublicFriendsList(userEditDto.getPublicFriendsList());
+        userEntity.setPublicPlays(userEditDto.getPublicPlays());
+
+        if (profilePicture != null) {
+            if (profilePicture.getSize() > MAX_PROFILE_PICTURE_SIZE_BYTES) {
+                throw new FieldValidationException(Map.of("Profile picture", "Profile picture exceeds maximum size limit of 2MB"));
+            }
+
+            String profilePictureUrl = awsService.uploadProfilePicture(userId, profilePicture);
+
+            if (profilePictureUrl == null) {
+                throw new FieldValidationException(Map.of("Profile picture", "Failed to upload profile picture"));
+            }
+
+            userEntity.setProfilePictureUrl(profilePictureUrl);
+        }
+
+        return userMapper.entityToRetrievalDto(userRepository.save(userEntity), null, null, null, null);
     }
 }

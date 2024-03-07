@@ -6,9 +6,9 @@ import com.socialnetwork.boardrift.repository.UserRepository;
 import com.socialnetwork.boardrift.repository.model.EmailVerificationTokenEntity;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
-import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.service.EmailService;
 import com.socialnetwork.boardrift.service.UserService;
 import com.socialnetwork.boardrift.util.exception.DuplicateFriendRequestException;
@@ -24,18 +24,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
-import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
@@ -73,12 +68,12 @@ public class UserServiceUnitTests {
     @BeforeEach
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
-                "2001-11-16", "Username", "Password@123", true, false, false, "",
+                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false,  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>());
 
         userEntity2 = new UserEntity(2L, "Name2", "Lastname2", "email2@gmail.com",
-                "2001-11-16", "Username2", "Password@123", true, false, false, "",
+                "2001-11-16", "Username2", "Password@123", "", "", "", true, false, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false,  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>());
 
@@ -86,7 +81,7 @@ public class UserServiceUnitTests {
                 "email@gmail.com", "2001-11-16",
                 "Username", "Password@123");
 
-        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", false, false, false, false, false, false, false);
+        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", "", "", "", false, false, false, false, false, false, false);
 
         userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
 

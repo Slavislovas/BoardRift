@@ -6,7 +6,7 @@ import com.socialnetwork.boardrift.repository.model.post.PollOptionEntity;
 import com.socialnetwork.boardrift.repository.model.post.PollPostEntity;
 import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.post.SimplePostEntity;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGameDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostRetrievalDto;
@@ -17,7 +17,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;

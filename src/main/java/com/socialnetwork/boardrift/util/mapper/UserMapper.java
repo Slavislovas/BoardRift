@@ -1,9 +1,9 @@
 package com.socialnetwork.boardrift.util.mapper;
 
 import com.socialnetwork.boardrift.repository.model.UserEntity;
-import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

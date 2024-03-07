@@ -1,6 +1,6 @@
 package com.socialnetwork.boardrift.rest.model.post;
 
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;

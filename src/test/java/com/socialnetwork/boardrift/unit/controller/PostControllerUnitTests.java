@@ -4,7 +4,7 @@ import com.socialnetwork.boardrift.enumeration.UserStatus;
 import com.socialnetwork.boardrift.rest.controller.PostController;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostCreationDto;
 import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostRetrievalDto;

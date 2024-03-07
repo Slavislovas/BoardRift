@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model;
+package com.socialnetwork.boardrift.rest.model.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -17,6 +17,9 @@ public class UserRetrievalDto {
     private String dateOfBirth;
     private String username;
     private String profilePictureUrl;
+    private String bio;
+    private String country;
+    private String city;
     private Boolean publicPosts;
     private Boolean publicFriendsList;
     private Boolean publicPlays;

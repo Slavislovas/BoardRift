@@ -1,7 +1,7 @@
 package com.socialnetwork.boardrift.rest.model.post.played_game_post;
 
 import com.socialnetwork.boardrift.repository.model.post.Post;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

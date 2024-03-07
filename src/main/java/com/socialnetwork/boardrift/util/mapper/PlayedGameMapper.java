@@ -1,7 +1,7 @@
 package com.socialnetwork.boardrift.util.mapper;
 
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGameDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

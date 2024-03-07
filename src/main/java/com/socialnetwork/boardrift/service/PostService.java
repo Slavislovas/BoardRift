@@ -17,7 +17,7 @@ import com.socialnetwork.boardrift.repository.model.post.PostCommentEntity;
 import com.socialnetwork.boardrift.repository.model.post.PostLikeEntity;
 import com.socialnetwork.boardrift.repository.model.post.SimplePostEntity;
 import com.socialnetwork.boardrift.rest.model.BGGThingResponse;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
 import com.socialnetwork.boardrift.rest.model.post.PostPageDto;
@@ -85,7 +85,6 @@ public class PostService {
 
         return postMapper.playedGamePostEntityToRetrievalDto(playedGamePostEntity);
     }
-
 
     private PlayedGamePostEntity createNoScorePlayedGamePost(PlayedGamePostCreationDto playedGamePostCreationDto, UserEntity postCreatorEntity, BGGThingResponse boardGame) {
         PlayedGameEntity postCreatorPlayedGameEntity = new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),

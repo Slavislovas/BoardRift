@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.rest.model;
+package com.socialnetwork.boardrift.rest.model.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.socialnetwork.boardrift.util.AgeConstraint;

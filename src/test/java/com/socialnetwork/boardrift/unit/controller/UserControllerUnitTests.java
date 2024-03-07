@@ -5,12 +5,11 @@ import com.socialnetwork.boardrift.enumeration.UserStatus;
 import com.socialnetwork.boardrift.repository.model.UserEntity;
 import com.socialnetwork.boardrift.rest.controller.UserController;
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
-import com.socialnetwork.boardrift.rest.model.UserRegistrationDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalDto;
-import com.socialnetwork.boardrift.rest.model.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
+import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.service.UserService;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +52,7 @@ public class UserControllerUnitTests {
     @BeforeEach
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
-                "2001-11-16", "Username", "Password@123", true, false, false, "",
+                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET);
 
@@ -61,7 +60,7 @@ public class UserControllerUnitTests {
                 "email@gmail.com", "2001-11-16",
                 "Username", "Password@123");
 
-        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", false, false, false, false, false, false, false);
+        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", "", "", "", false, false, false, false, false, false, false);
         userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
         friendRequestDto = new FriendRequestDto(userRetrievalMinimalDto, userRetrievalMinimalDto);
     }
