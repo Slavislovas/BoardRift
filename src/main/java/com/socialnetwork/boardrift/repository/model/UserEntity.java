@@ -18,7 +18,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -76,6 +75,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "public_plays")
     private Boolean publicPlays = false;
 
+    @Column(name = "public_statistics")
+    private Boolean publicStatistics = false;
+
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
@@ -130,7 +132,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override
@@ -176,5 +178,10 @@ public class UserEntity implements UserDetails {
 
     public void addPlayedGame(PlayedGameEntity playedGame) {
         playedGames.add(playedGame);
+    }
+
+    public void removeFromFriendsList(Long friendId) {
+        friends.removeIf(userEntity -> userEntity.getId().equals(friendId));
+        friendOf.removeIf(userEntity -> userEntity.getId().equals(friendId));
     }
 }

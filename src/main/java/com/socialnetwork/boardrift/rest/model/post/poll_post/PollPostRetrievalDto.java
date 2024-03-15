@@ -19,6 +19,7 @@ public class PollPostRetrievalDto implements Post {
     private UserRetrievalMinimalDto postCreator;
     private Set<PollOptionRetrievalDto> options;
     private Boolean alreadyVoted = false;
+    private Boolean isEditable = true;
     private PollOptionRetrievalDto selectedOption;
     private String type = "poll";
     private Integer likes;

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +30,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<AuthenticationResponseDto> refreshToken(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto, BindingResult bindingResult) throws IOException {
+    public ResponseEntity<AuthenticationResponseDto> refreshToken(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto, BindingResult bindingResult) {
         RequestValidator.validateRequest(bindingResult);
         return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequestDto));
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequestDto refreshTokenRequestDto, BindingResult bindingResult) {
+        RequestValidator.validateRequest(bindingResult);
+        authenticationService.logout(refreshTokenRequestDto);
+        return ResponseEntity.ok().build();
     }
 }

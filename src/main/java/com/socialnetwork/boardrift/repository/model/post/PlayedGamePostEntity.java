@@ -26,20 +26,11 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "played_game_posts")
-public class PlayedGamePostEntity implements Post{
+public class PlayedGamePostEntity implements Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_played_game_post")
     private Long id;
-
-    @Column(name = "id_bgg_game")
-    private Long bggGameId;
-
-    @Column(name = "game_name")
-    private String gameName;
-
-    @Column(name = "game_picture_url")
-    private String gamePictureUrl;
 
     @Column(name = "highest_score")
     private Integer highestScore;
@@ -57,7 +48,7 @@ public class PlayedGamePostEntity implements Post{
     @JoinColumn(name = "id_simple_post")
     private SimplePostEntity basePost;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "play")
     private PlayedGameEntity playedGame;
 

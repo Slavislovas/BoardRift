@@ -37,6 +37,9 @@ public class UserEditDto {
     @NotNull(message = "Public plays privacy setting required")
     private Boolean publicPlays;
 
+    @NotNull(message = "Public statistics privacy setting required")
+    private Boolean publicStatistics;
+
     private String country;
 
     private String city;

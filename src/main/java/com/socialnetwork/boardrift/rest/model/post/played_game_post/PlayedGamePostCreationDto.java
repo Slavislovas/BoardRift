@@ -35,6 +35,8 @@ public class PlayedGamePostCreationDto {
    @NoArgsConstructor
    @AllArgsConstructor
    public static class SelectedPlayerDto {
+        private Long playedGameId;
+
        @NotNull(message = "Player id cannot be null")
        private Long id;
 

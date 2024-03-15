@@ -25,6 +25,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AWSService awsService;
 
     @Value("${jwt.secret.key}")
     private String jwtSecretKey;
@@ -62,7 +63,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getId().toString())
                 .claim("role", userDetails.getRole())
-                .claim("profilePictureUrl", userDetails.getProfilePictureUrl())
+                .claim("profilePictureUrl", awsService.getPreSignedUrl(userDetails.getId()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -119,5 +120,9 @@ public class JwtService {
 
     public RefreshTokenEntity findRefreshTokenEntityByToken(String token) {
         return refreshTokenRepository.findByToken(token).orElseThrow(RefreshTokenNotFoundException::new);
+    }
+
+    public void deleteRefreshTokenByToken(String token) {
+        refreshTokenRepository.deleteByToken(token);
     }
 }

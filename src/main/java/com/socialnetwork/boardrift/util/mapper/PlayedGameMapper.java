@@ -13,14 +13,11 @@ import java.util.Set;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserMapper.class})
 public interface PlayedGameMapper {
-
-    @Mapping(target = "gameName", expression = "java(gameName)")
-    @Mapping(target = "gamePictureUrl", expression = "java(gamePictureUrl)")
     @Mapping(source = "entity", target = "associatedPlays", qualifiedByName = "associatedPlayEntitiesToDtos")
     @Mapping(source = "entity", target = "highestScore", qualifiedByName = "mapHighestScore")
     @Mapping(source = "entity", target = "lowestScore", qualifiedByName = "mapLowestScore")
     @Mapping(source = "entity", target = "averageScore", qualifiedByName = "mapAverageScore")
-    PlayedGameDto entityToDto(PlayedGameEntity entity, String gameName, String gamePictureUrl);
+    PlayedGameDto entityToDto(PlayedGameEntity entity);
 
     @Named("associatedPlayEntitiesToDtos")
     public static Set<PlayedGameDto> associatedPlayEntitiesToDtos(PlayedGameEntity playedGame) {

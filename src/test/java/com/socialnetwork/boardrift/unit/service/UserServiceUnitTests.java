@@ -68,12 +68,12 @@ public class UserServiceUnitTests {
     @BeforeEach
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
-                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, "",
+                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false,  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>());
 
         userEntity2 = new UserEntity(2L, "Name2", "Lastname2", "email2@gmail.com",
-                "2001-11-16", "Username2", "Password@123", "", "", "", true, false, false, "",
+                "2001-11-16", "Username2", "Password@123", "", "", "", true, false, false, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false,  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>());
 
@@ -81,7 +81,7 @@ public class UserServiceUnitTests {
                 "email@gmail.com", "2001-11-16",
                 "Username", "Password@123");
 
-        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", "", "", "", false, false, false, false, false, false, false);
+        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", null, "", "", "", false, false, false, false, false, false, false, false);
 
         userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
 
@@ -374,13 +374,13 @@ public class UserServiceUnitTests {
     @Test
     void getUserEntityByUsernameShouldSucceed() {
         Mockito.when(userRepository.findByUsername(any())).thenReturn(Optional.of(userEntity));
-        UserEntity result = userService.getUserEntityByUsername("username");
+        UserEntity result = userService.getUserEntityByEmail("username");
         Assertions.assertEquals(userEntity, result);
     }
 
     @Test
     void getUserEntityByUsernameShouldFail() {
         Mockito.when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserEntityByUsername(""));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserEntityByEmail(""));
     }
 }

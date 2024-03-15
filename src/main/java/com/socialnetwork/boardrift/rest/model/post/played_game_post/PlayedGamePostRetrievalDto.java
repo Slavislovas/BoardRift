@@ -1,5 +1,6 @@
 package com.socialnetwork.boardrift.rest.model.post.played_game_post;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.socialnetwork.boardrift.repository.model.post.Post;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.Set;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,6 +26,8 @@ public class PlayedGamePostRetrievalDto implements Post {
     private Integer lowestScore;
     private Double averageScore;
     private UserRetrievalMinimalDto postCreator;
+    private Boolean postCreatorWon;
+    private Integer postCreatorPoints;
     private Set<PlayedGameDto> plays;
     private Integer comments;
     private Integer likes;

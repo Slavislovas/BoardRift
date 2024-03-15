@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -32,8 +33,8 @@ public class PollPostEntity implements Post {
     @Column(name = "id_poll_post")
     private Long id;
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL})
-    private Set<PollOptionEntity> options;
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<PollOptionEntity> options;
 
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "id_simple_post")

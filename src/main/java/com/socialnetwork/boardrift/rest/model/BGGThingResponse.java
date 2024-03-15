@@ -2,6 +2,7 @@ package com.socialnetwork.boardrift.rest.model;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -16,14 +17,14 @@ import java.util.List;
 public class BGGThingResponse {
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    @JacksonXmlProperty(localName = "item")
-    private List<Item> items;
+    @JacksonXmlProperty(localName = "boardgame")
+    private List<BoardGame> items;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Item {
+    public static class BoardGame {
 
         @JacksonXmlProperty(isAttribute = true)
         private String type;
@@ -36,6 +37,9 @@ public class BGGThingResponse {
 
         @JacksonXmlProperty(localName = "image")
         private String image;
+
+        @JacksonXmlProperty(localName = "boardgamecategory")
+        private String boardGameCategory;
 
         @JacksonXmlElementWrapper(useWrapping = false)
         @JacksonXmlProperty(localName = "name")
@@ -58,14 +62,13 @@ public class BGGThingResponse {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class Name {
-
             @JacksonXmlProperty(isAttribute = true)
             private String type;
 
             @JacksonXmlProperty(isAttribute = true)
             private int sortindex;
 
-            @JacksonXmlProperty(isAttribute = true)
+            @JacksonXmlText
             private String value;
         }
 

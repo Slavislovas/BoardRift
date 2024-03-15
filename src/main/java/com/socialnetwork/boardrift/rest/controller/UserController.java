@@ -7,6 +7,7 @@ import com.socialnetwork.boardrift.rest.model.user.UserEditDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
+import com.socialnetwork.boardrift.rest.model.statistics.UserStatisticsDto;
 import com.socialnetwork.boardrift.service.UserService;
 import com.socialnetwork.boardrift.util.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
@@ -42,7 +42,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserRetrievalDto> getUserById(@PathVariable(name = "userId") Long userId) {
+    public ResponseEntity<UserRetrievalDto> getUserById(@PathVariable(name = "userId") Long userId) throws IllegalAccessException {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
@@ -67,9 +67,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getFriends(userId));
     }
 
-    @GetMapping("/{userId}/friends/search")
-    public ResponseEntity<Set<UserRetrievalMinimalDto>> searchFriendsByName(@PathVariable("userId") Long userId, @RequestParam(value = "query", required = false) String query) throws IllegalAccessException {
-        return ResponseEntity.ok(userService.searchFriendsByName(userId, query));
+    @GetMapping("/search")
+    public ResponseEntity<Set<UserRetrievalMinimalDto>> searchUsers(@RequestParam(value = "query", required = false) String query,
+                                                                    @RequestParam("page") Integer page,
+                                                                    @RequestParam("pageSize") Integer pageSize) {
+        return ResponseEntity.ok(userService.searchUsers(query, page, pageSize));
     }
 
     @GetMapping("/{userId}/plays")
@@ -78,6 +80,11 @@ public class UserController {
                                                                     @RequestParam("pageSize") Integer pageSize,
                                                                     HttpServletRequest request) throws IllegalAccessException {
         return ResponseEntity.ok(userService.getPlayedGamesByUserId(userId, page, pageSize, request));
+    }
+
+    @GetMapping("/{userId}/statistics")
+    public ResponseEntity<UserStatisticsDto> getStatisticsByUserId(@PathVariable("userId") Long userId) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.getStatisticsByUserId(userId));
     }
 
     @PostMapping("/register")
@@ -117,6 +124,12 @@ public class UserController {
     @DeleteMapping("/plays/{playId}")
     public ResponseEntity<Void> deletePlayedGameById(@PathVariable("playId") Long playId) {
         userService.deletePlayedGameById(playId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public ResponseEntity<Void> removeFromFriendsList(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) throws IllegalAccessException {
+        userService.removeFromFriendsList(userId, friendId);
         return ResponseEntity.ok().build();
     }
 }

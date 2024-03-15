@@ -53,7 +53,7 @@ public class ChatMessageService {
 
     public List<ChatMessageDto> getChatMessages(Long senderId, Long recipientId) throws IllegalAccessException {
         UserDetails senderUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity senderUserEntity = userService.getUserEntityByUsername(senderUserDetails.getUsername());
+        UserEntity senderUserEntity = userService.getUserEntityByEmail(senderUserDetails.getUsername());
 
         if (!senderUserEntity.getId().equals(senderId) && !senderUserEntity.getId().equals(recipientId)) {
             throw new IllegalAccessException("You cannot view other people's chat messages");

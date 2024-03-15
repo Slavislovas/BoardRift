@@ -13,27 +13,37 @@ import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePo
 import com.socialnetwork.boardrift.rest.model.post.poll_post.PollOptionRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostRetrievalDto;
+import com.socialnetwork.boardrift.service.AWSService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {UserMapper.class})
-public interface PostMapper {
+public abstract class PostMapper {
+    @Autowired
+    AWSService awsService;
+
     @Mapping(target = "likes", expression = "java(entity.getBasePost().getLikes().size())")
     @Mapping(target = "comments", expression = "java(entity.getBasePost().getComments().size())")
     @Mapping(target = "description", expression = "java(entity.getBasePost().getDescription())")
     @Mapping(target = "creationDate", expression = "java(entity.getBasePost().getCreationDate())")
     @Mapping(target = "postCreator", expression = "java(userMapper.entityToMinimalRetrievalDto(entity.getBasePost().getPostCreator()))")
+    @Mapping(target = "postCreatorWon", expression = "java(entity.getPlayedGame().getWon())")
+    @Mapping(target = "postCreatorPoints", expression = "java(entity.getPlayedGame().getScore())")
+    @Mapping(target = "bggGameId", expression = "java(entity.getPlayedGame().getBggGameId())")
+    @Mapping(target = "gameName", expression = "java(entity.getPlayedGame().getGameName())")
+    @Mapping(target = "gamePictureUrl", expression = "java(entity.getPlayedGame().getGamePictureUrl())")
     @Mapping(source = "playedGame", target = "plays", qualifiedByName = "playToPlayedGamePostPlaysRetrievalDto")
-    PlayedGamePostRetrievalDto playedGamePostEntityToRetrievalDto(PlayedGamePostEntity entity);
+   public abstract PlayedGamePostRetrievalDto playedGamePostEntityToRetrievalDto(PlayedGamePostEntity entity);
 
     @Mapping(target = "likes", expression = "java(entity.getLikes().size())")
     @Mapping(target = "comments", expression = "java(entity.getComments().size())")
-    SimplePostRetrievalDto simplePostEntityToRetrievalDto(SimplePostEntity entity);
+    public abstract SimplePostRetrievalDto simplePostEntityToRetrievalDto(SimplePostEntity entity);
 
     @Mapping(target = "likes", expression = "java(entity.getBasePost().getLikes().size())")
     @Mapping(target = "comments", expression = "java(entity.getBasePost().getComments().size())")
@@ -41,21 +51,31 @@ public interface PostMapper {
     @Mapping(target = "creationDate", expression = "java(entity.getBasePost().getCreationDate())")
     @Mapping(target = "options", qualifiedByName = "pollOptionEntityToRetrievalDto")
     @Mapping(target = "postCreator", expression = "java(userMapper.entityToMinimalRetrievalDto(entity.getBasePost().getPostCreator()))")
-    PollPostRetrievalDto pollPostEntityToRetrievalDto(PollPostEntity entity);
+    @Mapping(source = "entity", target = "isEditable", qualifiedByName = "isPollPostEditable")
+   public abstract PollPostRetrievalDto pollPostEntityToRetrievalDto(PollPostEntity entity);
 
     @Mapping(target = "votes", expression = "java(entity.getVotes().size())")
     @Named("pollOptionEntityToRetrievalDto")
-    PollOptionRetrievalDto pollOptionEntityToRetrievalDto(PollOptionEntity entity);
+   public abstract PollOptionRetrievalDto pollOptionEntityToRetrievalDto(PollOptionEntity entity);
+
+    @Named("isPollPostEditable")
+    public Boolean isPollPostEditable(PollPostEntity entity) {
+        return entity
+                .getOptions()
+                .stream()
+                .allMatch(pollOptionEntity -> pollOptionEntity.getVotes().isEmpty());
+    };
 
     @Named("playToPlayedGamePostPlaysRetrievalDto")
-    public static Set<PlayedGameDto> playToPlayedGamePostPlaysRetrievalDto(PlayedGameEntity playedGame) {
+    public Set<PlayedGameDto> playToPlayedGamePostPlaysRetrievalDto(PlayedGameEntity playedGame) {
         Set<PlayedGameDto> plays = new HashSet<>();
+
         plays.add(new PlayedGameDto(playedGame.getId(), playedGame.getBggGameId(),
                 null, null, playedGame.getScore(),
                 playedGame.getWon(), playedGame.getScoringSystem(),
                 null, null, null, null,
                 new UserRetrievalMinimalDto(playedGame.getUser().getId(), playedGame.getUser().getName(), playedGame.getUser().getLastname(),
-                        playedGame.getUser().getProfilePictureUrl(), playedGame.getUser().getStatus()), null));
+                        awsService.getPreSignedUrl(playedGame.getUser().getId()), playedGame.getUser().getStatus()), null));
 
         playedGame.getAssociatedPlays().stream().forEach(play -> {
             plays.add(new PlayedGameDto(play.getId(), play.getBggGameId(),
@@ -63,12 +83,11 @@ public interface PostMapper {
                     play.getWon(), play.getScoringSystem(),
                     null, null, null, null,
                     new UserRetrievalMinimalDto(play.getUser().getId(), play.getUser().getName(), play.getUser().getLastname(),
-                            play.getUser().getProfilePictureUrl(), play.getUser().getStatus()), null));
+                            awsService.getPreSignedUrl(play.getUser().getId()), play.getUser().getStatus()), null));
         });
 
         return plays;
     }
 
-
-    PostCommentDto postCommentEntityToDto(PostCommentEntity playedGamePostCommentEntity);
+    public abstract PostCommentDto postCommentEntityToDto(PostCommentEntity playedGamePostCommentEntity);
 }

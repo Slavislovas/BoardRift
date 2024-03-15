@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -37,6 +38,15 @@ public class PlayedGameEntity {
     @Column(name = "id_bgg_game")
     private Long bggGameId;
 
+    @Column(name = "game_name")
+    private String gameName;
+
+    @Column(name = "game_picture_url")
+    private String gamePictureUrl;
+
+    @Column(name = "game_category")
+    private String gameCategory;
+
     @Column(name = "score")
     private Integer score;
 
@@ -53,16 +63,16 @@ public class PlayedGameEntity {
     @JoinColumn(name = "id_user")
     private UserEntity user;
 
-    @OneToOne(mappedBy = "playedGame", cascade = {CascadeType.REMOVE})
+    @OneToOne(mappedBy = "playedGame", cascade = {CascadeType.ALL})
     private PlayedGamePostEntity post;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
             name = "associated_plays",
             joinColumns = @JoinColumn(name = "id_play"),
             inverseJoinColumns = @JoinColumn(name = "id_friend_play")
     )
-    private Set<PlayedGameEntity> associatedPlays;
+    private List<PlayedGameEntity> associatedPlays;
 
     public void addAssociatedPlay(PlayedGameEntity playedGame) {
         associatedPlays.add(playedGame);

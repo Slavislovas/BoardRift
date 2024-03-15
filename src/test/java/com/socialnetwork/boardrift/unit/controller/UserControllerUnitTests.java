@@ -52,7 +52,7 @@ public class UserControllerUnitTests {
     @BeforeEach
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
-                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, "",
+                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, false, "",
                 Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET);
 
@@ -60,7 +60,7 @@ public class UserControllerUnitTests {
                 "email@gmail.com", "2001-11-16",
                 "Username", "Password@123");
 
-        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", "", "", "", false, false, false, false, false, false, false);
+        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", "", "", "", false, false, false, false, false, false, false, false);
         userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
         friendRequestDto = new FriendRequestDto(userRetrievalMinimalDto, userRetrievalMinimalDto);
     }
@@ -68,17 +68,16 @@ public class UserControllerUnitTests {
     @Test
     void searchFriendsByNameShouldSucceed() throws IllegalAccessException {
         // Arrange
-        Long userId = 1L;
         Set<UserRetrievalMinimalDto> expectedUsers = new HashSet<>(); // assuming this is populated somehow
-        when(userService.searchFriendsByName(userId, null)).thenReturn(expectedUsers);
+        when(userService.searchUsers(any(), any(), any())).thenReturn(expectedUsers);
 
         // Act
-        ResponseEntity<Set<UserRetrievalMinimalDto>> response = userController.searchFriendsByName(userId, null);
+        ResponseEntity<Set<UserRetrievalMinimalDto>> response = userController.searchUsers("userId", 0, 2);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expectedUsers, response.getBody());
-        verify(userService, times(1)).searchFriendsByName(userId, null);
+        verify(userService, times(1)).searchUsers("userId", 0, 2);
     }
 
     @Test

@@ -120,11 +120,11 @@ public class PostServiceUnitTests {
         playedGamePostCreationDto.setPostCreatorPoints(200);
 
         PlayedGamePostCreationDto.SelectedPlayerDto playerDto = new PlayedGamePostCreationDto.SelectedPlayerDto();
-        playerDto.setId(1L);
+        playerDto.setPlayedGameId(1L);
         playerDto.setPoints(200);
 
         PlayedGamePostCreationDto.SelectedPlayerDto playerDto2 = new PlayedGamePostCreationDto.SelectedPlayerDto();
-        playerDto2.setId(2L);
+        playerDto2.setPlayedGameId(2L);
         playerDto2.setPoints(100);
 
         playedGamePostCreationDto.setPlayers(new HashSet<>(Set.of(playerDto, playerDto2)));
@@ -132,12 +132,12 @@ public class PostServiceUnitTests {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDetails.getUsername());
         userEntity.setPlayedGames(new ArrayList<>());
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
         when(userService.getUserEntityById(any())).thenReturn(userEntity);
 
         BGGThingResponse boardGameResponse = new BGGThingResponse();
-        BGGThingResponse.Item item = new BGGThingResponse.Item();
-        BGGThingResponse.Item.Name name = new BGGThingResponse.Item.Name();
+        BGGThingResponse.BoardGame item = new BGGThingResponse.BoardGame();
+        BGGThingResponse.BoardGame.Name name = new BGGThingResponse.BoardGame.Name();
         name.setValue("Test Game");
         item.setNames(List.of(name));
         item.setImage("test_image");
@@ -170,7 +170,7 @@ public class PostServiceUnitTests {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDetails.getUsername());
-        when(userService.getUserEntityByUsername(userDetails.getUsername())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(userDetails.getUsername())).thenReturn(userEntity);
 
         assertThrows(FieldValidationException.class, () -> postService.createPlayedGamePost(playedGamePostCreationDto));
 
@@ -187,7 +187,7 @@ public class PostServiceUnitTests {
         UserEntity voterEntity = new UserEntity();
         voterEntity.setId(1L);
 
-        when(userService.getUserEntityByUsername(userDetails.getUsername())).thenReturn(voterEntity);
+        when(userService.getUserEntityByEmail(userDetails.getUsername())).thenReturn(voterEntity);
 
         PollPostEntity pollPostEntity = new PollPostEntity();
         pollPostEntity.setId(pollId);
@@ -196,7 +196,7 @@ public class PostServiceUnitTests {
         pollOptionEntity.setId(optionId);
         pollOptionEntity.setVotes(new HashSet<>());
 
-        pollPostEntity.setOptions(Collections.singleton(pollOptionEntity));
+        pollPostEntity.setOptions(List.of(pollOptionEntity));
 
         when(pollPostRepository.findById(pollId)).thenReturn(Optional.of(pollPostEntity));
 
@@ -215,7 +215,7 @@ public class PostServiceUnitTests {
         UserEntity voterEntity = new UserEntity();
         voterEntity.setId(1L);
 
-        when(userService.getUserEntityByUsername(userDetails.getUsername())).thenReturn(voterEntity);
+        when(userService.getUserEntityByEmail(userDetails.getUsername())).thenReturn(voterEntity);
 
         PollPostEntity pollPostEntity = new PollPostEntity();
         pollPostEntity.setId(pollId);
@@ -228,7 +228,7 @@ public class PostServiceUnitTests {
         existingVote.setVoter(voterEntity);
         pollOptionEntity.setVotes(Set.of(existingVote));
 
-        pollPostEntity.setOptions(Collections.singleton(pollOptionEntity));
+        pollPostEntity.setOptions(List.of(pollOptionEntity));
 
         when(pollPostRepository.findById(pollId)).thenReturn(Optional.of(pollPostEntity));
 
@@ -248,7 +248,7 @@ public class PostServiceUnitTests {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDetails.getUsername());
 
-        when(userService.getUserEntityByUsername(userDetails.getUsername())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(userDetails.getUsername())).thenReturn(userEntity);
 
         SimplePostEntity simplePostEntity = new SimplePostEntity();
         when(simplePostRepository.findById(postId)).thenReturn(java.util.Optional.of(simplePostEntity));
@@ -277,7 +277,7 @@ public class PostServiceUnitTests {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDetails.getUsername());
 
-        when(userService.getUserEntityByUsername(userDetails.getUsername())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(userDetails.getUsername())).thenReturn(userEntity);
 
         PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity();
         when(playedGamePostRepository.findById(postId)).thenReturn(java.util.Optional.of(playedGamePostEntity));
@@ -306,7 +306,7 @@ public class PostServiceUnitTests {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDetails.getUsername());
 
-        when(userService.getUserEntityByUsername(userDetails.getUsername())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(userDetails.getUsername())).thenReturn(userEntity);
 
         PollPostEntity pollPostEntity = new PollPostEntity();
         when(pollPostRepository.findById(postId)).thenReturn(java.util.Optional.of(pollPostEntity));
@@ -339,7 +339,7 @@ public class PostServiceUnitTests {
         SimplePostCreationDto simplePostCreationDto = new SimplePostCreationDto("Description");
 
         UserEntity userEntity = new UserEntity();
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         SimplePostEntity savedSimplePostEntity = new SimplePostEntity();
         when(simplePostRepository.save(any(SimplePostEntity.class))).thenReturn(savedSimplePostEntity);
@@ -352,17 +352,17 @@ public class PostServiceUnitTests {
 
         // Assert
         assertEquals(expectedDto, result);
-        verify(userService, times(1)).getUserEntityByUsername(any());
+        verify(userService, times(1)).getUserEntityByEmail(any());
         verify(simplePostRepository, times(1)).save(any(SimplePostEntity.class));
         verify(postMapper, times(1)).simplePostEntityToRetrievalDto(savedSimplePostEntity);
     }
 
     @Test
     void createPollPost_ShouldReturnDto_WhenValidInput() {
-        PollPostCreationDto pollPostCreationDto = new PollPostCreationDto("Question", Collections.singletonList(new PollOptionDto("Option")));
+        PollPostCreationDto pollPostCreationDto = new PollPostCreationDto("Question", Collections.singletonList(new PollOptionDto(1L, "Option")));
 
         UserEntity userEntity = new UserEntity();
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         PollPostEntity savedPollPostEntity = new PollPostEntity();
         when(pollPostRepository.save(any(PollPostEntity.class))).thenReturn(savedPollPostEntity);
@@ -375,7 +375,7 @@ public class PostServiceUnitTests {
 
         // Assert
         assertEquals(expectedDto, result);
-        verify(userService, times(1)).getUserEntityByUsername(any());
+        verify(userService, times(1)).getUserEntityByEmail(any());
         verify(pollPostRepository, times(1)).save(any(PollPostEntity.class));
         verify(postMapper, times(1)).pollPostEntityToRetrievalDto(savedPollPostEntity);
     }
@@ -397,15 +397,13 @@ public class PostServiceUnitTests {
 
         SimplePostEntity simplePost  = new SimplePostEntity(1L, "description", new Date(), new UserEntity(), commentEntities, new HashSet<>(), null, null, null);
 
-        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId, 2L,
-                "CATAN",
-                "pictureUrl",
+        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId,
                 100, 20, 50.0,
                 "lowest-score",
                 simplePost,
                 new PlayedGameEntity());
 
-        PollPostEntity pollPost = new PollPostEntity(1L, new HashSet<>(), simplePost);
+        PollPostEntity pollPost = new PollPostEntity(1L, new ArrayList<>(), simplePost);
 
         lenient().when(postCommentRepository.findAllBySimplePostId(eq(postId), any(PageRequest.class))).thenReturn(commentEntities);
         lenient().when(playedGamePostRepository.findById(any())).thenReturn(Optional.of(playedGamePostEntity));
@@ -456,7 +454,7 @@ public class PostServiceUnitTests {
     void likePost_SimplePost_Success() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         Long postId = 1L;
         when(simplePostRepository.findById(postId)).thenReturn(Optional.of(new SimplePostEntity()));
@@ -471,7 +469,7 @@ public class PostServiceUnitTests {
     void likePost_SimplePost_Unlike_Success() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         when(simplePostRepository.findById(any())).thenReturn(Optional.of(new SimplePostEntity()));
 
@@ -488,13 +486,11 @@ public class PostServiceUnitTests {
     void likePost_PlayedGamePost_Success() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         Long postId = 1L;
 
-        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId, 2L,
-                "CATAN",
-                "pictureUrl",
+        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId,
                 100, 20, 50.0,
                 "lowest-score",
                 new SimplePostEntity(1L, "description", new Date(), userEntity, new ArrayList<>(), new HashSet<>(), null, null, null),
@@ -511,13 +507,11 @@ public class PostServiceUnitTests {
     @Test
     void likePost_PlayedGamePost_Unlike_Success() {
         UserEntity userEntity = new UserEntity();
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         Long postId = 1L;
 
-        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId, 2L,
-                "CATAN",
-                "pictureUrl",
+        PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(postId,
                 100, 20, 50.0,
                 "lowest-score",
                 new SimplePostEntity(1L, "description", new Date(), userEntity, new ArrayList<>(), new HashSet<>(), null, null, null),
@@ -535,12 +529,12 @@ public class PostServiceUnitTests {
     void likePost_PollPost_Success() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         Long postId = 1L;
 
         PollPostEntity pollPostEntity = new PollPostEntity(postId,
-                new HashSet<>(),
+                new ArrayList<>(),
                 new SimplePostEntity(1L, "description",
                         new Date(), userEntity, new ArrayList<>(),
                         new HashSet<>(), null,
@@ -560,12 +554,12 @@ public class PostServiceUnitTests {
     void likePost_PollPost_Unlike_Success() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
-        when(userService.getUserEntityByUsername(any())).thenReturn(userEntity);
+        when(userService.getUserEntityByEmail(any())).thenReturn(userEntity);
 
         Long postId = 1L;
 
         PollPostEntity pollPostEntity = new PollPostEntity(postId,
-                new HashSet<>(),
+                new ArrayList<>(),
                 new SimplePostEntity(1L, "description",
                         new Date(), userEntity, new ArrayList<>(),
                         new HashSet<>(), null,

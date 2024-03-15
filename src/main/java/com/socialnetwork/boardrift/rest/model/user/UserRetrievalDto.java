@@ -23,6 +23,7 @@ public class UserRetrievalDto {
     private Boolean publicPosts;
     private Boolean publicFriendsList;
     private Boolean publicPlays;
+    private Boolean publicStatistics;
     private Boolean userAlreadyFriend;
     private Boolean friendRequestAlreadySent;
     private Boolean alreadyReceivedFriendRequest;

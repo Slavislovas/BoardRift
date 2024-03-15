@@ -17,9 +17,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -90,6 +92,48 @@ public class PostController {
     public ResponseEntity<Void> likePost(@PathVariable(name = "postType") String postType,
                                          @PathVariable(name = "postId") Long postId) {
         postService.likePost(postType, postId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/posts/simple/{simplePostId}")
+    public ResponseEntity<SimplePostRetrievalDto> editSimplePost(@PathVariable("simplePostId") Long simplePostId,
+                                                                 @Valid @RequestBody SimplePostCreationDto simplePostCreationDto,
+                                                                 BindingResult bindingResult) throws IllegalAccessException {
+        RequestValidator.validateRequest(bindingResult);
+        return ResponseEntity.ok(postService.editSimplePost(simplePostId, simplePostCreationDto));
+    }
+
+    @PutMapping("/posts/poll/{pollPostId}")
+    public ResponseEntity<PollPostRetrievalDto> editPollPost(@PathVariable("pollPostId") Long pollPostId,
+                                                             @Valid @RequestBody PollPostCreationDto pollPostCreationDto,
+                                                             BindingResult bindingResult) throws IllegalAccessException {
+        RequestValidator.validateRequest(bindingResult);
+        return ResponseEntity.ok(postService.editPollPost(pollPostId, pollPostCreationDto));
+    }
+
+    @PutMapping("/posts/played-game/{playedGamePostId}")
+    public ResponseEntity<PlayedGamePostRetrievalDto> editPlayedGamePost(@PathVariable("playedGamePostId") Long playedGamePostId,
+                                                                         @Valid @RequestBody PlayedGamePostCreationDto playedGamePostCreationDto,
+                                                                         BindingResult bindingResult) throws IllegalAccessException {
+        RequestValidator.validateRequest(bindingResult);
+        return ResponseEntity.ok(postService.editPlayedGamePost(playedGamePostId, playedGamePostCreationDto));
+    }
+
+    @DeleteMapping("/posts/simple/{simplePostId}")
+    public ResponseEntity<Void> deleteSimplePost(@PathVariable("simplePostId") Long simplePostId) throws IllegalAccessException {
+        postService.deleteSimplePost(simplePostId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/posts/poll/{pollPostId}")
+    public ResponseEntity<Void> deletePollPost(@PathVariable("pollPostId") Long pollPostId) throws IllegalAccessException {
+        postService.deletePollPost(pollPostId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/posts/played-game/{playedGamePostId}")
+    public ResponseEntity<Void> deletePlayedGamePost(@PathVariable("playedGamePostId") Long playedGamePostId) throws IllegalAccessException {
+        postService.deletePlayedGamePost(playedGamePostId);
         return ResponseEntity.ok().build();
     }
 }

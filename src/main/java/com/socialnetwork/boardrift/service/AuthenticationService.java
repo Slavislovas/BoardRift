@@ -13,6 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -27,7 +29,7 @@ public class AuthenticationService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
+                            request.getEmail(),
                             request.getPassword()
                     )
             );
@@ -35,7 +37,7 @@ public class AuthenticationService {
             throw new InvalidLoginCredentialsException();
         }
 
-        UserEntity userEntity = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + request.getUsername()  + " was not found"));
+        UserEntity userEntity = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new EntityNotFoundException("User with email: " + request.getEmail()  + " was not found"));
 
         if (!userEntity.getEmailVerified()) {
             throw new EmailNotVerifiedException("Please verify your email before logging in");
@@ -61,5 +63,9 @@ public class AuthenticationService {
         String jwtToken = jwtService.generateToken(refreshTokenEntity.getUser());
 
         return new AuthenticationResponseDto(jwtToken, refreshTokenEntity.getToken());
+    }
+
+    public void logout(RefreshTokenRequestDto refreshTokenRequestDto) {
+        jwtService.deleteRefreshTokenByToken(refreshTokenRequestDto.getToken());
     }
 }
