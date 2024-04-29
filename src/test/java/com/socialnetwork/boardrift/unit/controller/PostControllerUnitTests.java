@@ -48,8 +48,10 @@ public class PostControllerUnitTests {
 
     @BeforeEach
     void init() {
-        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
-        playedGamePostRetrievalDto = new PlayedGamePostRetrievalDto(1L, 2L, "gameName", "gamePicture", "Description", "no-score", new Date(), 500, 300, 1.20, userRetrievalMinimalDto, false, 0, new HashSet<>(), 5, 0, false, null);
+        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE, false, 0, false);
+        playedGamePostRetrievalDto = new PlayedGamePostRetrievalDto(1L, 2L, "gameName", "gamePicture",
+                "Description", "no-score", new Date(), 500, 300, 1.20,
+                userRetrievalMinimalDto, false, 0, new HashSet<>(), 5, 0, false, false, null, new ArrayList<>());
         postCommentPageDto = new PostCommentPageDto("nextUrl", new ArrayList<>());
     }
 

@@ -1,13 +1,8 @@
 package com.socialnetwork.boardrift.config.filter;
 
 import com.socialnetwork.boardrift.repository.UserRepository;
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import com.socialnetwork.boardrift.service.JwtService;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.io.DecodingException;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

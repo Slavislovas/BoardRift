@@ -1,6 +1,7 @@
 package com.socialnetwork.boardrift.util.listener;
 
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.VerificationTokenEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import com.socialnetwork.boardrift.service.EmailService;
 import com.socialnetwork.boardrift.util.event.OnRegistrationCompleteEvent;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +28,11 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
         UserEntity userEntity = event.getUserEntity();
-        String token = UUID.randomUUID().toString();
-        emailService.createEmailVerificationToken(userEntity, token);
+        VerificationTokenEntity emailVerificationTokenEntity = emailService.createEmailVerificationToken(userEntity);
 
         String recipientEmailAddress = userEntity.getEmail();
         String subject = "Board Rift Registration Confirmation";
-        String confirmationUrl = event.getAppUrl() + "/users/register/confirm?token=" + token;
+        String confirmationUrl = event.getAppUrl() + "/users/register/confirm?token=" + emailVerificationTokenEntity.getToken();
         String message = buildMessage(userEntity, confirmationUrl);
 
         SimpleMailMessage email = new SimpleMailMessage();
@@ -45,7 +45,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     private String buildMessage(UserEntity userEntity, String confirmationUrl) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("Dear ").append(userEntity.getUsername()).append(",\n");
+        stringBuilder.append("Dear ").append(userEntity.getName()).append(" ").append(userEntity.getLastname()).append(",\n");
         stringBuilder.append("\n");
         stringBuilder.append("Thank you for registering with our service. To complete the registration process and verify your email address, please click on the following link:\n");
         stringBuilder.append("\n");

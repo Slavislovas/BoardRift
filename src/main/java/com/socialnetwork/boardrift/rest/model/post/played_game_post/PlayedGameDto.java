@@ -27,4 +27,6 @@ public class PlayedGameDto {
     private Date creationDate;
     private UserRetrievalMinimalDto user;
     private Set<PlayedGameDto> associatedPlays;
+    private Boolean editable;
+    private String ownerName;
 }

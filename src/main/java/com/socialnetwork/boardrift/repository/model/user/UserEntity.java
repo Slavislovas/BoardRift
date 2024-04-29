@@ -1,7 +1,9 @@
-package com.socialnetwork.boardrift.repository.model;
+package com.socialnetwork.boardrift.repository.model.user;
 
 import com.socialnetwork.boardrift.enumeration.Role;
 import com.socialnetwork.boardrift.enumeration.UserStatus;
+import com.socialnetwork.boardrift.repository.model.ChatMessageEntity;
+import com.socialnetwork.boardrift.repository.model.WarningEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,9 +54,6 @@ public class UserEntity implements UserDetails {
     @Column(name = "date_of_birth")
     private String dateOfBirth;
 
-    @Column(name = "username")
-    private String username;
-
     @Column(name = "password")
     private String password;
 
@@ -90,6 +90,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "email_verified")
     private Boolean emailVerified = false;
 
+    @OneToMany(mappedBy = "recipient", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<WarningEntity> receivedWarnings;
+
     @ManyToMany
     @JoinTable(
             name = "friends",
@@ -106,7 +109,7 @@ public class UserEntity implements UserDetails {
     )
     private Set<UserEntity> friendOf;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayedGameEntity> playedGames;
 
     @ManyToMany
@@ -124,6 +127,12 @@ public class UserEntity implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "id_sender", referencedColumnName = "id_user")
     )
     private Set<UserEntity> receivedFriendInvites;
+
+    @OneToMany(mappedBy = "recipient")
+    private List<ChatMessageEntity> receivedChatMessages;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private SuspensionEntity suspension;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -157,7 +166,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return suspension == null;
     }
 
     public void addSentFriendRequest(UserEntity receiver) {
@@ -174,10 +183,6 @@ public class UserEntity implements UserDetails {
 
     public void removeReceivedFriendRequest(UserEntity senderUserEntity) {
         receivedFriendInvites.remove(senderUserEntity);
-    }
-
-    public void addPlayedGame(PlayedGameEntity playedGame) {
-        playedGames.add(playedGame);
     }
 
     public void removeFromFriendsList(Long friendId) {

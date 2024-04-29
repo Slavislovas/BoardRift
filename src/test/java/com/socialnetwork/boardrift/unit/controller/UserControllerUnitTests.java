@@ -2,7 +2,8 @@ package com.socialnetwork.boardrift.unit.controller;
 
 import com.socialnetwork.boardrift.enumeration.Role;
 import com.socialnetwork.boardrift.enumeration.UserStatus;
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.user.SuspensionEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import com.socialnetwork.boardrift.rest.controller.UserController;
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
@@ -25,9 +26,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,16 +55,16 @@ public class UserControllerUnitTests {
     @BeforeEach
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
-                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
-                Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET);
+                "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
+                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
+                Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET, new ArrayList<>(), null);
 
         userRegistrationDto = new UserRegistrationDto("Name", "Lastname",
-                "email@gmail.com", "2001-11-16",
-                "Username", "Password@123");
+                "email@gmail.com", "2001-11-16", "Password@123");
 
-        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "Username", "", "", "", "", false, false, false, false, false, false, false, false);
-        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE);
+        userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "", "", "", "", false, false,
+        false, false, false, false, false, false, false, new ArrayList<>());
+        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE, false, 0, false);
         friendRequestDto = new FriendRequestDto(userRetrievalMinimalDto, userRetrievalMinimalDto);
     }
 
@@ -107,11 +110,11 @@ public class UserControllerUnitTests {
 
     @Test
     void getReceivedFriendRequestsShouldSucceed() {
-        when(userService.getReceivedFriendRequests()).thenReturn(Set.of(userRetrievalMinimalDto));
-        ResponseEntity<Set<UserRetrievalMinimalDto>> result = userController.getReceivedFriendRequests();
+        when(userService.getReceivedFriendRequests(any(), any())).thenReturn(List.of(userRetrievalMinimalDto));
+        ResponseEntity<List<UserRetrievalMinimalDto>> result = userController.getReceivedFriendRequests(1, 1);
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(Set.of(userRetrievalMinimalDto), result.getBody());
+        assertEquals(List.of(userRetrievalMinimalDto), result.getBody());
     }
 
     @Test
@@ -133,7 +136,7 @@ public class UserControllerUnitTests {
     }
 
     @Test
-    void sendFriendRequestShouldSucceed() {
+    void sendFriendRequestShouldSucceed() throws IllegalAccessException {
         when(userService.sendFriendRequest(any())).thenReturn(friendRequestDto);
         ResponseEntity<FriendRequestDto> result = userController.sendFriendRequest(1L);
 

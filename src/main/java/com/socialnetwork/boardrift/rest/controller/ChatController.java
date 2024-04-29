@@ -4,9 +4,9 @@ import com.socialnetwork.boardrift.rest.model.ChatMessageDto;
 import com.socialnetwork.boardrift.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,16 +19,17 @@ import java.util.List;
 @RestController
 public class ChatController {
     private final ChatMessageService chatMessageService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/chat")
-    public void processMessage(@Payload ChatMessageDto chatMessageDto) throws IllegalAccessException {
-        ChatMessageDto savedChatMessageDto = chatMessageService.saveChatMessage(chatMessageDto);
+    public void processMessage(@Payload ChatMessageDto chatMessageDto,
+                               @Header(value = "Authorization", required = false) String accessToken) {
+        chatMessageService.sendAndSaveChatMessage(chatMessageDto, accessToken);
+    }
 
-        messagingTemplate.convertAndSendToUser(
-                chatMessageDto.getRecipientId().toString(),
-                "/queue/messages",
-                savedChatMessageDto);
+    @MessageMapping("/chat/messages/read")
+    public void setMessageToRead(@Payload ChatMessageDto chatMessageDto,
+                               @Header(value = "Authorization", required = false) String accessToken) {
+        chatMessageService.setChatMessageToRead(chatMessageDto, accessToken);
     }
 
     @GetMapping("/{senderId}/{recipientId}")

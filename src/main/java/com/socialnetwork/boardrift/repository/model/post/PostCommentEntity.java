@@ -1,6 +1,7 @@
 package com.socialnetwork.boardrift.repository.model.post;
 
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,4 +44,7 @@ public class PostCommentEntity {
     @ManyToOne
     @JoinColumn(name = "id_comment_creator")
     private UserEntity commentCreator;
+
+    @OneToMany(mappedBy = "reportedComment", orphanRemoval = true, cascade = {CascadeType.ALL})
+    private List<PostCommentReportEntity> reports;
 }

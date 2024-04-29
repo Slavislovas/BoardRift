@@ -17,7 +17,6 @@ public class UserStatisticsDto {
     private GameStatisticsDto favouriteGame;
     private Integer totalGamesWon;
     private Integer totalGamesLost;
-    private Map<String, Integer> amountOfTimesGenresPlayed;
     private FriendStatisticsDto favouriteFriend;
     private List<GameStatisticsDto> gameStatistics;
 }

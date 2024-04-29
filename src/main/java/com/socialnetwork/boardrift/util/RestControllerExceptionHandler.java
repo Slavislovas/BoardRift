@@ -2,6 +2,7 @@ package com.socialnetwork.boardrift.util;
 
 import com.socialnetwork.boardrift.util.exception.DuplicateFriendRequestException;
 import com.socialnetwork.boardrift.util.exception.DuplicatePollVoteException;
+import com.socialnetwork.boardrift.util.exception.DuplicateReportException;
 import com.socialnetwork.boardrift.util.exception.EmailNotVerifiedException;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
 import com.socialnetwork.boardrift.util.exception.EmailVerificationTokenExpiredException;
@@ -9,10 +10,15 @@ import com.socialnetwork.boardrift.util.exception.EmailVerificationTokenNotFound
 import com.socialnetwork.boardrift.util.exception.InvalidLoginCredentialsException;
 import com.socialnetwork.boardrift.util.exception.RefreshTokenNotFoundException;
 import com.socialnetwork.boardrift.util.exception.TokenRefreshException;
+import com.socialnetwork.boardrift.util.exception.TooManyWarningsException;
+import com.socialnetwork.boardrift.util.exception.UnauthorizedException;
+import com.socialnetwork.boardrift.util.exception.UserAlreadySuspendedException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.MessageHandlingException;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,6 +30,21 @@ public class RestControllerExceptionHandler {
 
     @ExceptionHandler(DuplicatePollVoteException.class)
     public ResponseEntity<String> handleDuplicatePollVoteException(DuplicatePollVoteException exception, HttpServletRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(TooManyWarningsException.class)
+    public ResponseEntity<String> handleTooManyWarningsException(TooManyWarningsException exception, HttpServletRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(DuplicateReportException.class)
+    public ResponseEntity<String> handleDuplicateReportException(DuplicateReportException exception, HttpServletRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UserAlreadySuspendedException.class)
+    public ResponseEntity<String> handleUserAlreadySuspendedException(UserAlreadySuspendedException exception, HttpServletRequest request) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
 
@@ -80,5 +101,10 @@ public class RestControllerExceptionHandler {
     @ExceptionHandler(IllegalAccessException.class)
     public ResponseEntity<String> handleIllegalAccessException(IllegalAccessException exception, HttpServletRequest request) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException exception, HttpServletRequest request) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

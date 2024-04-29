@@ -1,6 +1,6 @@
 package com.socialnetwork.boardrift.util.event;
 
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;

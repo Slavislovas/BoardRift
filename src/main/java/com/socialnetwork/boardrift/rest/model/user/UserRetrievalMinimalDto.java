@@ -19,4 +19,7 @@ public class UserRetrievalMinimalDto {
     private String lastname;
     private String profilePictureUrl;
     private UserStatus status;
+    private Boolean suspended;
+    private Integer warningCount;
+    private Boolean unreadMessages = null;
 }

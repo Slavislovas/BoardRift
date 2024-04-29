@@ -1,7 +1,7 @@
 package com.socialnetwork.boardrift.rest.model.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.socialnetwork.boardrift.util.AgeConstraint;
+import com.socialnetwork.boardrift.util.validation.AgeConstraint;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -36,11 +36,6 @@ public class UserRegistrationDto {
     @AgeConstraint(message = "You must be at least 18 years old")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private String dateOfBirth;
-
-    @NotBlank(message = "Username is required")
-    @Pattern(regexp = "^[a-zA-Z0-9_\\.]{8,}+$",
-            message = "Username must be at least 8 characters long, can only contain alphanumeric characters, underscores, dots")
-    private String username;
 
     @NotBlank(message = "Password is required")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",

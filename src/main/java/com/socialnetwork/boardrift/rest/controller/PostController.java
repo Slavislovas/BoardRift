@@ -3,6 +3,7 @@ package com.socialnetwork.boardrift.rest.controller;
 import com.socialnetwork.boardrift.rest.model.post.PostPageDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentDto;
 import com.socialnetwork.boardrift.rest.model.post.PostCommentPageDto;
+import com.socialnetwork.boardrift.rest.model.post.ReportDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostCreationDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGamePostRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostCreationDto;
@@ -10,7 +11,7 @@ import com.socialnetwork.boardrift.rest.model.post.poll_post.PollPostRetrievalDt
 import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostCreationDto;
 import com.socialnetwork.boardrift.rest.model.post.simple_post.SimplePostRetrievalDto;
 import com.socialnetwork.boardrift.service.PostService;
-import com.socialnetwork.boardrift.util.RequestValidator;
+import com.socialnetwork.boardrift.util.validation.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,20 @@ public class PostController {
                                                @RequestParam(name ="pageSize") Integer pageSize,
                                                HttpServletRequest request) {
         return ResponseEntity.ok(postService.getFeed(page, pageSize, request));
+    }
+
+    @GetMapping("/posts/reported")
+    public ResponseEntity<PostPageDto> getReportedPosts(@RequestParam(name = "page") Integer page,
+                                               @RequestParam(name ="pageSize") Integer pageSize,
+                                               HttpServletRequest request) {
+        return ResponseEntity.ok(postService.getReportedPosts(page, pageSize, request));
+    }
+
+    @GetMapping("/comments/reported")
+    public ResponseEntity<PostCommentPageDto> getReportedComments(@RequestParam(name = "page") Integer page,
+                                                       @RequestParam(name ="pageSize") Integer pageSize,
+                                                       HttpServletRequest request) {
+        return ResponseEntity.ok(postService.getReportedComments(page, pageSize, request));
     }
 
     @GetMapping("/posts/{postType}/{postId}/comments")
@@ -95,6 +110,32 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/posts/{postType}/{postId}/reports")
+    public ResponseEntity<ReportDto> reportPost(@PathVariable("postType") String postType,
+                                                @PathVariable("postId") Long postId,
+                                                @Valid @RequestBody ReportDto postReportDto, BindingResult bindingResult) {
+        RequestValidator.validateRequest(bindingResult);
+        return new ResponseEntity<>(postService.reportPost(postType, postId, postReportDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/posts/{postType}/{postId}/comments/{commentId}/reports")
+    public ResponseEntity<ReportDto> reportPostComment(@PathVariable("postType") String postType,
+                                                       @PathVariable("postId") Long postId,
+                                                       @PathVariable("commentId") Long commentId,
+                                                       @Valid @RequestBody ReportDto commentReportDto, BindingResult bindingResult) {
+        RequestValidator.validateRequest(bindingResult);
+        return new ResponseEntity<>(postService.reportComment(postType, postId, commentId, commentReportDto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/posts/{postType}/{postId}/comments/{commentId}")
+    public ResponseEntity<PostCommentDto> editPostComment(@PathVariable(name = "postType") String postType,
+                                                              @PathVariable(name = "postId") Long postId,
+                                                              @PathVariable(name = "commentId") Long commentId,
+                                                              @Valid @RequestBody PostCommentDto postCommentDto, BindingResult bindingResult) throws IllegalAccessException {
+        RequestValidator.validateRequest(bindingResult);
+        return ResponseEntity.ok(postService.editPostComment(postType, postId, commentId, postCommentDto));
+    }
+
     @PutMapping("/posts/simple/{simplePostId}")
     public ResponseEntity<SimplePostRetrievalDto> editSimplePost(@PathVariable("simplePostId") Long simplePostId,
                                                                  @Valid @RequestBody SimplePostCreationDto simplePostCreationDto,
@@ -119,6 +160,14 @@ public class PostController {
         return ResponseEntity.ok(postService.editPlayedGamePost(playedGamePostId, playedGamePostCreationDto));
     }
 
+    @DeleteMapping("/posts/{postType}/{postId}/comments/{commentId}")
+    public ResponseEntity<PostCommentDto> deletePostComment(@PathVariable(name = "postType") String postType,
+                                                          @PathVariable(name = "postId") Long postId,
+                                                          @PathVariable(name = "commentId") Long commentId) throws IllegalAccessException {
+        postService.deletePostComment(postType, postId, commentId);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/posts/simple/{simplePostId}")
     public ResponseEntity<Void> deleteSimplePost(@PathVariable("simplePostId") Long simplePostId) throws IllegalAccessException {
         postService.deleteSimplePost(simplePostId);
@@ -134,6 +183,21 @@ public class PostController {
     @DeleteMapping("/posts/played-game/{playedGamePostId}")
     public ResponseEntity<Void> deletePlayedGamePost(@PathVariable("playedGamePostId") Long playedGamePostId) throws IllegalAccessException {
         postService.deletePlayedGamePost(playedGamePostId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/posts/{postType}/{postId}/reports")
+    public ResponseEntity<Void> deletePostReports(@PathVariable("postType") String postType,
+                                                 @PathVariable("postId") Long postId) {
+        postService.deletePostReports(postType, postId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/posts/{postType}/{postId}/comments/{commentId}/reports")
+    public ResponseEntity<Void> deletePostCommentReports(@PathVariable("postType") String postType,
+                                                         @PathVariable("postId") Long postId,
+                                                         @PathVariable("commentId") Long commentId) {
+        postService.deleteCommentReports(postType, postId, commentId);
         return ResponseEntity.ok().build();
     }
 }

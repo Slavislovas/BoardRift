@@ -1,6 +1,6 @@
 package com.socialnetwork.boardrift.repository.model.post;
 
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +27,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "simple_posts")
-public class SimplePostEntity implements Post {
+public class SimplePostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -43,18 +43,18 @@ public class SimplePostEntity implements Post {
     @JoinColumn(name = "id_post_creator")
     private UserEntity postCreator;
 
-    @OneToMany(mappedBy = "simplePost", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "simplePost", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<PostCommentEntity> comments;
 
-    @OneToMany(mappedBy = "simplePost", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "simplePost", cascade = CascadeType.ALL)
     private Set<PostLikeEntity> likes;
 
-    @OneToOne(mappedBy = "basePost", cascade = {CascadeType.ALL})
+    @OneToOne(mappedBy = "basePost", cascade = CascadeType.ALL)
     private PlayedGamePostEntity childPlayedGamePost;
 
-    @OneToOne(mappedBy = "basePost", cascade = {CascadeType.ALL})
-    private MarketplacePostEntity childMarketplacePost;
-
-    @OneToOne(mappedBy = "basePost", cascade = {CascadeType.ALL})
+    @OneToOne(mappedBy = "basePost", cascade = CascadeType.ALL)
     private PollPostEntity childPollPost;
+
+    @OneToMany(mappedBy = "reportedPost", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<PostReportEntity> reports;
 }

@@ -13,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessageDto {
+    Long id;
     String chatId;
     private String content;
     private Date timestamp;

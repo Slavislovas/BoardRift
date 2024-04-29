@@ -4,8 +4,8 @@ import com.socialnetwork.boardrift.enumeration.Role;
 import com.socialnetwork.boardrift.enumeration.UserStatus;
 import com.socialnetwork.boardrift.repository.RefreshTokenRepository;
 import com.socialnetwork.boardrift.repository.model.RefreshTokenEntity;
-import com.socialnetwork.boardrift.repository.model.UserEntity;
-import com.socialnetwork.boardrift.service.AWSService;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
+import com.socialnetwork.boardrift.service.AwsService;
 import com.socialnetwork.boardrift.service.JwtService;
 import com.socialnetwork.boardrift.util.exception.RefreshTokenNotFoundException;
 import io.jsonwebtoken.Claims;
@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.security.Key;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class JwtServiceUnitTests {
     RefreshTokenRepository refreshTokenRepository;
 
     @Mock
-    AWSService awsService;
+    AwsService awsService;
 
     @InjectMocks
     JwtService jwtService;
@@ -52,16 +53,16 @@ public class JwtServiceUnitTests {
         jwtService.setJwtAccessTokenLifetimeInMilliseconds(300000);
         jwtService.setJwtRefreshTokenLifetimeInMilliseconds(259200000);
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
-                "2001-11-16", "Username", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_SET,
-                Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET);
+                "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
+                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
+                Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET, new ArrayList<>(),
+        null);
         signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode("GFR4d2dfg7gESRGZX52dxcbvrDF85qjGGFDS42121BVCXRDFUKJCVBDFGsd2"));
         refreshTokenEntity = new RefreshTokenEntity(null, new Date(System.currentTimeMillis() + 80000), userEntity);
     }
 
     @Test
     void generateTokenShouldSucceed() {
-        Mockito.when(awsService.getPreSignedUrl(1L)).thenReturn("presignedUrl");
         String token = jwtService.generateToken(userEntity);
 
         Claims claims = Jwts.parserBuilder()

@@ -1,5 +1,6 @@
 package com.socialnetwork.boardrift.repository.model;
 
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,11 +29,14 @@ public class ChatMessageEntity {
     @Column(name = "id_chat")
     String chatId;
 
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "timestamp")
     private Date timestamp;
+
+    @Column(name = "unread")
+    private Boolean unread;
 
     @ManyToOne
     @JoinColumn(name = "id_sender")

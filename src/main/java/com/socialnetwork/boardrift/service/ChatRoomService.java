@@ -1,10 +1,12 @@
 package com.socialnetwork.boardrift.service;
 
+import com.socialnetwork.boardrift.repository.ChatMessageRepository;
 import com.socialnetwork.boardrift.repository.ChatRoomRepository;
 import com.socialnetwork.boardrift.repository.UserRepository;
 import com.socialnetwork.boardrift.repository.model.ChatRoomEntity;
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.Optional;
 @Service
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
 
     public Optional<String> getChatRoomId(Long senderId, Long recipientId, boolean createNewRoomIfNotExists) {
@@ -41,5 +44,10 @@ public class ChatRoomService {
         chatRoomRepository.save(recipientSender);
 
         return chatId;
+    }
+
+    public void deleteChatRoomByChatId(String chatId) {
+        chatRoomRepository.deleteByChatId(chatId);
+        chatMessageRepository.deleteByChatId(chatId);
     }
 }

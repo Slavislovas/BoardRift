@@ -22,7 +22,7 @@ public class GameStatisticsDto {
     private Integer amountOfTimesLost;
     private Integer currentWinStreak;
     private Integer longestWinStreak;
-    private Integer longestLossStreak;
+    private FriendStatisticsDto favouriteFriend;
 
     public Integer getTotalPlays() {
         return amountOfTimesWon + amountOfTimesLost;

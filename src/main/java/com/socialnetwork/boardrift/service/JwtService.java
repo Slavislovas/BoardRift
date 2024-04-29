@@ -2,7 +2,7 @@ package com.socialnetwork.boardrift.service;
 
 import com.socialnetwork.boardrift.repository.RefreshTokenRepository;
 import com.socialnetwork.boardrift.repository.model.RefreshTokenEntity;
-import com.socialnetwork.boardrift.repository.model.UserEntity;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import com.socialnetwork.boardrift.util.exception.RefreshTokenNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -25,7 +25,6 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     private final RefreshTokenRepository refreshTokenRepository;
-    private final AWSService awsService;
 
     @Value("${jwt.secret.key}")
     private String jwtSecretKey;
@@ -63,7 +62,6 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getId().toString())
                 .claim("role", userDetails.getRole())
-                .claim("profilePictureUrl", awsService.getPreSignedUrl(userDetails.getId()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

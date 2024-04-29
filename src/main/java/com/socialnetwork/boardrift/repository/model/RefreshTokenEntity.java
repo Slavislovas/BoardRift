@@ -1,5 +1,6 @@
 package com.socialnetwork.boardrift.repository.model;
 
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -2,14 +2,17 @@ package com.socialnetwork.boardrift.rest.controller;
 
 import com.socialnetwork.boardrift.rest.model.FriendRequestDto;
 import com.socialnetwork.boardrift.rest.model.PlayedGamePageDto;
+import com.socialnetwork.boardrift.rest.model.WarningDto;
 import com.socialnetwork.boardrift.rest.model.post.played_game_post.PlayedGameDto;
+import com.socialnetwork.boardrift.rest.model.user.SuspensionDto;
 import com.socialnetwork.boardrift.rest.model.user.UserEditDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.rest.model.statistics.UserStatisticsDto;
+import com.socialnetwork.boardrift.service.AdministratorService;
 import com.socialnetwork.boardrift.service.UserService;
-import com.socialnetwork.boardrift.util.RequestValidator;
+import com.socialnetwork.boardrift.util.validation.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
@@ -40,6 +44,7 @@ public class UserController {
     @Value("${client.domain}")
     private String clientDomain;
     private final UserService userService;
+    private final AdministratorService administratorService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserRetrievalDto> getUserById(@PathVariable(name = "userId") Long userId) throws IllegalAccessException {
@@ -53,8 +58,9 @@ public class UserController {
     }
 
     @GetMapping("/friend-requests/received")
-    public ResponseEntity<Set<UserRetrievalMinimalDto>> getReceivedFriendRequests() {
-        return ResponseEntity.ok(userService.getReceivedFriendRequests());
+    public ResponseEntity<List<UserRetrievalMinimalDto>> getReceivedFriendRequests(@RequestParam(value = "page", required = false) Integer page,
+                                                                                   @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        return ResponseEntity.ok(userService.getReceivedFriendRequests(page, pageSize));
     }
 
     @GetMapping("/friend-requests/sent")
@@ -82,6 +88,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getPlayedGamesByUserId(userId, page, pageSize, request));
     }
 
+    @GetMapping("/plays/{playId}")
+    public ResponseEntity<PlayedGameDto> getPlayedGamyByUserIdAndPlayId (@PathVariable("playId") Long playId) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.getPlayedGameByUserIdAndPlayId(playId));
+    }
+
     @GetMapping("/{userId}/statistics")
     public ResponseEntity<UserStatisticsDto> getStatisticsByUserId(@PathVariable("userId") Long userId) throws IllegalAccessException {
         return ResponseEntity.ok(userService.getStatisticsByUserId(userId));
@@ -93,8 +104,16 @@ public class UserController {
         return new ResponseEntity<>(userService.createUser(userRegistrationDto, servletRequest), HttpStatus.CREATED);
     }
 
+    @PostMapping("/{userId}/warnings")
+    public ResponseEntity<WarningDto> warnUser(@PathVariable("userId") Long userId,
+                                               @Valid @RequestBody WarningDto warningDto,
+                                               BindingResult bindingResult) throws IllegalAccessException {
+        RequestValidator.validateRequest(bindingResult);
+        return new ResponseEntity<>(administratorService.warnUser(userId, warningDto), HttpStatus.CREATED);
+    }
+
     @PostMapping("/{receiverId}/friend-requests/send")
-    public ResponseEntity<FriendRequestDto> sendFriendRequest(@PathVariable("receiverId") Long receiverId) {
+    public ResponseEntity<FriendRequestDto> sendFriendRequest(@PathVariable("receiverId") Long receiverId) throws IllegalAccessException {
         return new ResponseEntity<>(userService.sendFriendRequest(receiverId), HttpStatus.CREATED);
     }
 
@@ -108,6 +127,13 @@ public class UserController {
         return new ResponseEntity<>(userService.logPlayedGame(playedGameDto), HttpStatus.CREATED);
     }
 
+    @PostMapping("/{userId}/suspensions")
+    public ResponseEntity<Void> suspendUser(@PathVariable("userId") Long userId,
+                                        @RequestBody SuspensionDto suspensionDto) throws IllegalAccessException {
+        administratorService.suspendUser(userId, suspensionDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     @PutMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserRetrievalDto> editUserById(@PathVariable("userId") Long userId,
                                                          @RequestParam(name = "profilePicture", required = false) MultipartFile profilePicture,
@@ -116,13 +142,29 @@ public class UserController {
         return ResponseEntity.ok(userService.editUserById(userId, profilePicture, userEditDto));
     }
 
+    @PutMapping("/plays/{playId}")
+    public ResponseEntity<PlayedGameDto> editPlayedGameById(@PathVariable("playId") Long playId,
+                                                            @RequestBody PlayedGameDto playedGameDto) {
+        return ResponseEntity.ok(userService.editPlayedGameById(playId, playedGameDto));
+    }
+
+    @PutMapping("/plays/{playId}/approve")
+    public ResponseEntity<PlayedGameDto> includePlayInStatistics(@PathVariable("playId") Long playId) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.includePlayInStatistics(playId));
+    }
+
+    @PutMapping("/plays/{playId}/decline")
+    public ResponseEntity<PlayedGameDto> excludePlayFromStatistics(@PathVariable("playId") Long playId) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.excludePlayFromStatistics(playId));
+    }
+
     @DeleteMapping("/{senderId}/friend-requests/decline")
     public ResponseEntity<String> declineFriendRequest(@PathVariable("senderId") Long senderId) {
         return ResponseEntity.ok(userService.declineFriendRequest(senderId));
     }
 
     @DeleteMapping("/plays/{playId}")
-    public ResponseEntity<Void> deletePlayedGameById(@PathVariable("playId") Long playId) {
+    public ResponseEntity<Void> deletePlayedGameById(@PathVariable("playId") Long playId) throws IllegalAccessException {
         userService.deletePlayedGameById(playId);
         return ResponseEntity.ok().build();
     }
@@ -130,6 +172,18 @@ public class UserController {
     @DeleteMapping("/{userId}/friends/{friendId}")
     public ResponseEntity<Void> removeFromFriendsList(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) throws IllegalAccessException {
         userService.removeFromFriendsList(userId, friendId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{userId}/warnings/{warningId}")
+    public ResponseEntity<Void> deleteWarning(@PathVariable("userId") Long userId, @PathVariable("warningId") Long warningId) {
+        administratorService.deleteWarning(userId, warningId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{userId}/suspensions")
+    public ResponseEntity<Void> deleteSuspension(@PathVariable("userId") Long userId) {
+        administratorService.deleteSuspension(userId);
         return ResponseEntity.ok().build();
     }
 }

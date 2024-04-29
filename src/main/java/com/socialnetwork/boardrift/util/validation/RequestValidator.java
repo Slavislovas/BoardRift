@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.util;
+package com.socialnetwork.boardrift.util.validation;
 
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
 import org.springframework.validation.BindingResult;

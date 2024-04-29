@@ -1,12 +1,14 @@
 package com.socialnetwork.boardrift.repository.model;
 
+import com.socialnetwork.boardrift.enumeration.VerificationTokenType;
+import com.socialnetwork.boardrift.repository.model.user.UserEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,24 +24,28 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "email_verification_tokens")
-public class EmailVerificationTokenEntity {
+@Table(name = "verification_tokens")
+public class VerificationTokenEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "token")
     private String token;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "id_user")
-    private UserEntity userEntity;
+    @Column(name = "expiration_date")
+    private Date expirationDate;
 
-    private Date expiryDate;
+    @Column(name = "type")
+    private VerificationTokenType type;
 
-    public EmailVerificationTokenEntity(String token, UserEntity userEntity, int expiryTimeInMinutes){
+    @ManyToOne
+    @JoinColumn(name = "id_user")
+    UserEntity user;
+
+    public VerificationTokenEntity(String token, VerificationTokenType type, UserEntity userEntity, int expiryTimeInMinutes){
         this.token = token;
-        this.userEntity = userEntity;
-        this.expiryDate = calculateExpiryDate(expiryTimeInMinutes);
+        this.type = type;
+        this.user = userEntity;
+        this.expirationDate = calculateExpiryDate(expiryTimeInMinutes);
     }
 
     private Date calculateExpiryDate(int expiryTimeInMinutes) {

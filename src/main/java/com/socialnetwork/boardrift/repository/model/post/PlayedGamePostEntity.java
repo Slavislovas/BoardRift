@@ -8,8 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -17,16 +15,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.Set;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "played_game_posts")
-public class PlayedGamePostEntity implements Post {
+public class PlayedGamePostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_played_game_post")
@@ -51,9 +46,4 @@ public class PlayedGamePostEntity implements Post {
     @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "play")
     private PlayedGameEntity playedGame;
-
-    @Override
-    public Date getCreationDate() {
-        return basePost.getCreationDate();
-    }
 }

@@ -1,4 +1,4 @@
-package com.socialnetwork.boardrift.util;
+package com.socialnetwork.boardrift.util.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
