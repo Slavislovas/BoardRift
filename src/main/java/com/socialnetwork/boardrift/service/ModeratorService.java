@@ -42,7 +42,7 @@ public class ModeratorService {
         UserEntity recipientEntity = userService.getUserEntityById(userId);
 
         if (recipientEntity.getRole().equals(Role.ROLE_ADMIN)) {
-            throw new IllegalAccessException("You cannot warn an administrator");
+            throw new IllegalAccessException("You cannot warn a moderator");
         }
 
         if (recipientEntity.getReceivedWarnings().size() == 3) {
@@ -77,7 +77,7 @@ public class ModeratorService {
         UserEntity userEntity = userService.getUserEntityById(userId);
 
         if (userEntity.getRole().equals(Role.ROLE_ADMIN)) {
-            throw new IllegalAccessException("You cannot suspend an administrator");
+            throw new IllegalAccessException("You cannot suspend a moderator");
         }
 
         if (!userEntity.isEnabled()) {
