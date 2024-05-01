@@ -83,10 +83,7 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "role")
     private Role role = Role.ROLE_USER;
-
-    @Column(name = "status")
-    private UserStatus status = UserStatus.OFFLINE;
-
+    
     @Column(name = "email_verified")
     private Boolean emailVerified = false;
 

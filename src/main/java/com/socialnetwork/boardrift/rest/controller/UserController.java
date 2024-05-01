@@ -10,7 +10,7 @@ import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;
 import com.socialnetwork.boardrift.rest.model.statistics.UserStatisticsDto;
-import com.socialnetwork.boardrift.service.AdministratorService;
+import com.socialnetwork.boardrift.service.ModeratorService;
 import com.socialnetwork.boardrift.service.UserService;
 import com.socialnetwork.boardrift.util.validation.RequestValidator;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +44,7 @@ public class UserController {
     @Value("${client.domain}")
     private String clientDomain;
     private final UserService userService;
-    private final AdministratorService administratorService;
+    private final ModeratorService administratorService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserRetrievalDto> getUserById(@PathVariable(name = "userId") Long userId) throws IllegalAccessException {
@@ -123,7 +123,8 @@ public class UserController {
     }
 
     @PostMapping("/plays")
-    public ResponseEntity<PlayedGameDto> logPlayedGame(@RequestBody PlayedGameDto playedGameDto) {
+    public ResponseEntity<PlayedGameDto> logPlayedGame(@Valid @RequestBody PlayedGameDto playedGameDto, BindingResult bindingResult) {
+        RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(userService.logPlayedGame(playedGameDto), HttpStatus.CREATED);
     }
 
@@ -144,7 +145,7 @@ public class UserController {
 
     @PutMapping("/plays/{playId}")
     public ResponseEntity<PlayedGameDto> editPlayedGameById(@PathVariable("playId") Long playId,
-                                                            @RequestBody PlayedGameDto playedGameDto) {
+                                                            @RequestBody PlayedGameDto playedGameDto) throws IllegalAccessException {
         return ResponseEntity.ok(userService.editPlayedGameById(playId, playedGameDto));
     }
 

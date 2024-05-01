@@ -54,7 +54,7 @@ public class JwtServiceUnitTests {
         jwtService.setJwtRefreshTokenLifetimeInMilliseconds(259200000);
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
+                Role.ROLE_USER, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET, new ArrayList<>(),
         null);
         signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode("GFR4d2dfg7gESRGZX52dxcbvrDF85qjGGFDS42121BVCXRDFUKJCVBDFGsd2"));

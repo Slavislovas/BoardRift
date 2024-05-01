@@ -123,12 +123,12 @@ public class UserServiceUnitTests {
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, new ArrayList<>(),  new HashSet<>(),
+                Role.ROLE_USER, false, new ArrayList<>(),  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>(), new ArrayList<>(), null);
 
         userEntity2 = new UserEntity(2L, "Name2", "Lastname2", "email2@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, new ArrayList<>(),  new HashSet<>(),
+                Role.ROLE_USER, false, new ArrayList<>(),  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>(), new ArrayList<>(), null);
 
         userRegistrationDto = new UserRegistrationDto("Name", "Lastname",
@@ -136,9 +136,9 @@ public class UserServiceUnitTests {
 
         userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", null, "", "", "", false, false, false, false, false, false, false, false, false, new ArrayList<>());
 
-        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE, false, 0, false);
+        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", false, 0, false);
 
-        userRetrievalMinimalDto2 = new UserRetrievalMinimalDto(2L, "Name2", "Lastname2", "", UserStatus.OFFLINE,false, 0, false);
+        userRetrievalMinimalDto2 = new UserRetrievalMinimalDto(2L, "Name2", "Lastname2", "", false, 0, false);
 
         emailVerificationTokenEntity = new VerificationTokenEntity("token", VerificationTokenType.EMAIL_VERIFICATION, userEntity, 5000);
         playedGameEntity = new PlayedGameEntity(1L, 1L, "gameName",
@@ -813,7 +813,7 @@ public class UserServiceUnitTests {
 
     @ParameterizedTest
     @ValueSource(strings = {"highest-score", "lowest-score", "no-score"})
-    void editPlayedGame_shouldSucceed(String scoringSystem) {
+    void editPlayedGame_shouldSucceed(String scoringSystem) throws IllegalAccessException {
         playedGameDto.setScoringSystem(scoringSystem);
         playedGameEntity.setPost(playedGamePostEntity);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);

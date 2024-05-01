@@ -800,11 +800,17 @@ public class UserService {
     }
 
     @jakarta.transaction.Transactional
-    public PlayedGameDto editPlayedGameById(Long playId, PlayedGameDto playedGameDto) {
+    public PlayedGameDto editPlayedGameById(Long playId, PlayedGameDto playedGameDto) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity loggedInUserEntity = getUserEntityByEmail(userDetails.getUsername());
 
         PlayedGameEntity playedGameEntity = playedGameRepository.findById(playId).orElseThrow(() -> new EntityNotFoundException("Play with id: " + playId + " was not found"));
+
+        if (!Role.ROLE_ADMIN.name().equals(loggedInUserEntity.getRole().name())) {
+                if (!loggedInUserEntity.getEmail().equals(playedGameEntity.getUser().getEmail())) {
+                    throw new IllegalAccessException("You cannot edit another users play");
+                }
+        }
 
         List<Long> currentPlayIds = playedGameEntity.getAssociatedPlays().stream().map(PlayedGameEntity::getId).collect(Collectors.toList());
         PlayedGamePostEntity playedGamePostEntity = playedGameEntity.getPost();

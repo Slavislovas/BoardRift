@@ -36,7 +36,7 @@ public abstract class PlayedGameMapper {
                 plays.add(new PlayedGameDto(play.getId(), play.getBggGameId(), null, null, play.getScore(),
                         play.getWon(), play.getScoringSystem(), null, null, null, null,
                         new UserRetrievalMinimalDto(play.getUser().getId(), play.getUser().getName(), play.getUser().getLastname(),
-                                play.getUser().getProfilePictureUrl(), play.getUser().getStatus(), null, null, null),
+                                play.getUser().getProfilePictureUrl(), null, null, null),
                         null, null, null));
             });
         }
@@ -46,7 +46,7 @@ public abstract class PlayedGameMapper {
                 plays.add(new PlayedGameDto(play.getId(), play.getBggGameId(), null, null, play.getScore(),
                         play.getWon(), play.getScoringSystem(), null, null, null, null,
                         new UserRetrievalMinimalDto(play.getUser().getId(), play.getUser().getName(), play.getUser().getLastname(),
-                                play.getUser().getProfilePictureUrl(), play.getUser().getStatus(), null, null, null),
+                                play.getUser().getProfilePictureUrl(), null, null, null),
                         null, null, null));
             });
         }
@@ -58,7 +58,7 @@ public abstract class PlayedGameMapper {
                         plays.add(new PlayedGameDto(associatedPlay.getId(), associatedPlay.getBggGameId(), null, null, associatedPlay.getScore(),
                                 associatedPlay.getWon(), associatedPlay.getScoringSystem(), null, null, null, null,
                                 new UserRetrievalMinimalDto(associatedPlay.getUser().getId(), associatedPlay.getUser().getName(), associatedPlay.getUser().getLastname(),
-                                        associatedPlay.getUser().getProfilePictureUrl(), associatedPlay.getUser().getStatus(), null, null, null),
+                                        associatedPlay.getUser().getProfilePictureUrl(), null, null, null),
                                 null, null, null));
                     }
                 }

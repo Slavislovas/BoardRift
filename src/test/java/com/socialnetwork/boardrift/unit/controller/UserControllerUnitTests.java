@@ -56,7 +56,7 @@ public class UserControllerUnitTests {
     void init(){
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
+                Role.ROLE_USER, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET, new ArrayList<>(), null);
 
         userRegistrationDto = new UserRegistrationDto("Name", "Lastname",
@@ -64,7 +64,7 @@ public class UserControllerUnitTests {
 
         userRetrievalDto = new UserRetrievalDto(1L, "Name", "Lastname", "email@gmail.com", "2001-11-16", "", "", "", "", false, false,
         false, false, false, false, false, false, false, new ArrayList<>());
-        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", UserStatus.OFFLINE, false, 0, false);
+        userRetrievalMinimalDto = new UserRetrievalMinimalDto(1L, "Name", "Lastname", "", false, 0, false);
         friendRequestDto = new FriendRequestDto(userRetrievalMinimalDto, userRetrievalMinimalDto);
     }
 

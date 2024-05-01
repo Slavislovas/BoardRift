@@ -26,7 +26,7 @@ import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
-public class AdministratorService {
+public class ModeratorService {
     private final WarningRepository warningRepository;
     private final SuspensionRepository suspensionRepository;
     private final UserMapper userMapper;

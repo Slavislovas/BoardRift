@@ -63,7 +63,7 @@ public class AuthenticationServiceUnitTests {
         authenticationResponseDto = new AuthenticationResponseDto("accessToken", "refreshToken");
         userEntity = new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
+                Role.ROLE_USER, false, Collections.EMPTY_LIST, Collections.EMPTY_SET,
                 Collections.EMPTY_SET, Collections.EMPTY_LIST, Collections.EMPTY_SET, Collections.EMPTY_SET, new ArrayList<>(),
         new SuspensionEntity(1L, LocalDate.now(), "test", userEntity));
         refreshTokenEntity = new RefreshTokenEntity("refreshToken", new Date(), userEntity);

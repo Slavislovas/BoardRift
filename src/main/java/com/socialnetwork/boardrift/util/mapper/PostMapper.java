@@ -76,7 +76,7 @@ public abstract class PostMapper {
                 playedGame.getWon(), playedGame.getScoringSystem(),
                 null, null, null, null,
                 new UserRetrievalMinimalDto(playedGame.getUser().getId(), playedGame.getUser().getName(), playedGame.getUser().getLastname(),
-                        playedGame.getUser().getProfilePictureUrl(), playedGame.getUser().getStatus(), null, null, null), null,
+                        playedGame.getUser().getProfilePictureUrl(), null, null, null), null,
                 null, null));
 
         if (!playedGame.getAssociatedPlays().isEmpty()) {
@@ -87,7 +87,7 @@ public abstract class PostMapper {
                             play.getWon(), play.getScoringSystem(),
                             null, null, null, null,
                             new UserRetrievalMinimalDto(play.getUser().getId(), play.getUser().getName(), play.getUser().getLastname(),
-                                    play.getUser().getProfilePictureUrl(), play.getUser().getStatus(), null, null, null), null,
+                                    play.getUser().getProfilePictureUrl(), null, null, null), null,
                             null, null));
                 }
             });
@@ -100,7 +100,7 @@ public abstract class PostMapper {
                         play.getWon(), play.getScoringSystem(),
                         null, null, null, null,
                         new UserRetrievalMinimalDto(play.getUser().getId(), play.getUser().getName(), play.getUser().getLastname(),
-                                play.getUser().getProfilePictureUrl(), play.getUser().getStatus(), null, null, null), null,
+                                play.getUser().getProfilePictureUrl(), null, null, null), null,
                         null, null));
             });
         }

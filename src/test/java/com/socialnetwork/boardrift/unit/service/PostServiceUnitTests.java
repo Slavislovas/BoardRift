@@ -417,14 +417,14 @@ public class PostServiceUnitTests {
         postCommentEntity.setText("FirstText");
         postCommentEntity.setCommentCreator(new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, new ArrayList<>(),  new HashSet<>(),
+                Role.ROLE_USER, false, new ArrayList<>(),  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>(), new ArrayList<>(), null));
 
         PostCommentEntity postCommentEntity2 = new PostCommentEntity();
         postCommentEntity2.setText("SecondText");
         postCommentEntity2.setCommentCreator(new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, new ArrayList<>(),  new HashSet<>(),
+                Role.ROLE_USER,  false, new ArrayList<>(),  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>(), new ArrayList<>(), null));
 
         List<PostCommentEntity> commentEntities = List.of(postCommentEntity, postCommentEntity2);
@@ -445,17 +445,17 @@ public class PostServiceUnitTests {
         lenient().when(pollPostRepository.findById(any())).thenReturn(Optional.of(pollPost));
         lenient().when(userService.getUserEntityByEmail(any())).thenReturn(new UserEntity(1L, "Name", "Lastname", "email@gmail.com",
                 "2001-11-16", "Password@123", "", "", "", true, false, false, false, "",
-                Role.ROLE_USER, UserStatus.OFFLINE, false, new ArrayList<>(),  new HashSet<>(),
+                Role.ROLE_USER, false, new ArrayList<>(),  new HashSet<>(),
                 new HashSet<>(),  new ArrayList<>(),  new HashSet<>(), new HashSet<>(), new ArrayList<>(), null));
 
 
         PostCommentDto postCommentDto = new PostCommentDto();
         postCommentDto.setText("FirstText");
-        postCommentDto.setReports(List.of(new ReportDto(1L , "test", new UserRetrievalMinimalDto(1L, "test", "test", "test", UserStatus.OFFLINE, false, 0, false))));
+        postCommentDto.setReports(List.of(new ReportDto(1L , "test", new UserRetrievalMinimalDto(1L, "test", "test", "test", false, 0, false))));
 
         PostCommentDto postCommentDto2 = new PostCommentDto();
         postCommentDto2.setText("SecondText");
-        postCommentDto2.setReports(List.of(new ReportDto(1L , "test", new UserRetrievalMinimalDto(1L, "test", "test", "test", UserStatus.OFFLINE, false, 0, false))));
+        postCommentDto2.setReports(List.of(new ReportDto(1L , "test", new UserRetrievalMinimalDto(1L, "test", "test", "test", false, 0, false))));
 
         when(postMapper.postCommentEntityToDto(postCommentEntity)).thenReturn(postCommentDto);
         when(postMapper.postCommentEntityToDto(postCommentEntity2)).thenReturn(postCommentDto2);
@@ -1282,7 +1282,7 @@ public class PostServiceUnitTests {
         PostCommentEntity postCommentEntity = new PostCommentEntity(1L, "text", Instant.now(), simplePostEntity, userEntity, new ArrayList<>());
         simplePostEntity.setComments(List.of(postCommentEntity));
 
-        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity.getId(), userEntity.getName(), userEntity.getLastname(), userEntity.getProfilePictureUrl(), userEntity.getStatus(), false, 0, false);
+        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity.getId(), userEntity.getName(), userEntity.getLastname(), userEntity.getProfilePictureUrl(), false, 0, false);
         PostCommentDto postCommentDto = new PostCommentDto(1L, "text", "2024-04-29", userRetrievalMinimalDto, false, "simple", 1L, new ArrayList<>());
 
         when(simplePostRepository.findById(any())).thenReturn(Optional.of(simplePostEntity));
@@ -1312,7 +1312,7 @@ public class PostServiceUnitTests {
         PostCommentEntity postCommentEntity = new PostCommentEntity(1L, "text", Instant.now(), simplePostEntity, userEntity2, new ArrayList<>());
         simplePostEntity.setComments(List.of(postCommentEntity));
 
-        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity2.getId(), userEntity2.getName(), userEntity2.getLastname(), userEntity2.getProfilePictureUrl(), userEntity.getStatus(), false, 0, false);
+        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity2.getId(), userEntity2.getName(), userEntity2.getLastname(), userEntity2.getProfilePictureUrl(), false, 0, false);
         PostCommentDto postCommentDto = new PostCommentDto(1L, "text", "2024-04-29", userRetrievalMinimalDto, false, "simple", 1L, new ArrayList<>());
 
         when(simplePostRepository.findById(any())).thenReturn(Optional.of(simplePostEntity));
@@ -1338,7 +1338,7 @@ public class PostServiceUnitTests {
         PlayedGameEntity playedGameEntity = new PlayedGameEntity(1L ,1L, "gameName", "gamePictureUrl", "gameCategory", 100, false, "invalid", new Date(), false, userEntity, null, new HashSet<>(), new HashSet<>());
         PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(1L, 0, 0, 0.0, "no-score", simplePostEntity, playedGameEntity);
 
-        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity.getId(), userEntity.getName(), userEntity.getLastname(), userEntity.getProfilePictureUrl(), userEntity.getStatus(), false, 0, false);
+        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity.getId(), userEntity.getName(), userEntity.getLastname(), userEntity.getProfilePictureUrl(), false, 0, false);
         PostCommentDto postCommentDto = new PostCommentDto(1L, "text", "2024-04-29", userRetrievalMinimalDto, false, "played-game", 1L, new ArrayList<>());
 
         when(playedGamePostRepository.findById(any())).thenReturn(Optional.of(playedGamePostEntity));
@@ -1371,7 +1371,7 @@ public class PostServiceUnitTests {
         PlayedGameEntity playedGameEntity = new PlayedGameEntity(1L ,1L, "gameName", "gamePictureUrl", "gameCategory", 100, false, "invalid", new Date(), false, userEntity2, null, new HashSet<>(), new HashSet<>());
         PlayedGamePostEntity playedGamePostEntity = new PlayedGamePostEntity(1L, 0, 0, 0.0, "no-score", simplePostEntity, playedGameEntity);
 
-        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity2.getId(), userEntity2.getName(), userEntity2.getLastname(), userEntity2.getProfilePictureUrl(), userEntity2.getStatus(), false, 0, false);
+        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity2.getId(), userEntity2.getName(), userEntity2.getLastname(), userEntity2.getProfilePictureUrl(), false, 0, false);
         PostCommentDto postCommentDto = new PostCommentDto(1L, "text", "2024-04-29", userRetrievalMinimalDto, false, "played-game", 1L, new ArrayList<>());
 
         when(playedGamePostRepository.findById(any())).thenReturn(Optional.of(playedGamePostEntity));
@@ -1398,7 +1398,7 @@ public class PostServiceUnitTests {
                 new ArrayList<>(),
                simplePostEntity);
 
-        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity.getId(), userEntity.getName(), userEntity.getLastname(), userEntity.getProfilePictureUrl(), userEntity.getStatus(), false, 0, false);
+        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity.getId(), userEntity.getName(), userEntity.getLastname(), userEntity.getProfilePictureUrl(), false, 0, false);
         PostCommentDto postCommentDto = new PostCommentDto(1L, "text", "2024-04-29", userRetrievalMinimalDto, false, "poll", 1L, new ArrayList<>());
 
         when(pollPostRepository.findById(any())).thenReturn(Optional.of(pollPostEntity));
@@ -1432,7 +1432,7 @@ public class PostServiceUnitTests {
                 new ArrayList<>(),
                 simplePostEntity);
 
-        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity2.getId(), userEntity2.getName(), userEntity2.getLastname(), userEntity2.getProfilePictureUrl(), userEntity2.getStatus(), false, 0, false);
+        UserRetrievalMinimalDto userRetrievalMinimalDto = new UserRetrievalMinimalDto(userEntity2.getId(), userEntity2.getName(), userEntity2.getLastname(), userEntity2.getProfilePictureUrl(), false, 0, false);
         PostCommentDto postCommentDto = new PostCommentDto(1L, "text", "2024-04-29", userRetrievalMinimalDto, false, "poll", 1L, new ArrayList<>());
 
         when(pollPostRepository.findById(any())).thenReturn(Optional.of(pollPostEntity));
