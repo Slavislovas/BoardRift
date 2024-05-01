@@ -3,6 +3,8 @@ package com.socialnetwork.boardrift.unit.controller;
 import com.socialnetwork.boardrift.rest.controller.AuthenticationController;
 import com.socialnetwork.boardrift.rest.model.AuthenticationRequestDto;
 import com.socialnetwork.boardrift.rest.model.AuthenticationResponseDto;
+import com.socialnetwork.boardrift.rest.model.PasswordResetProcessDto;
+import com.socialnetwork.boardrift.rest.model.PasswordResetRequestDto;
 import com.socialnetwork.boardrift.rest.model.RefreshTokenRequestDto;
 import com.socialnetwork.boardrift.service.AuthenticationService;
 import com.socialnetwork.boardrift.util.exception.FieldValidationException;
@@ -38,12 +40,16 @@ public class AuthenticationControllerUnitTests {
     AuthenticationRequestDto authenticationRequestDto;
     RefreshTokenRequestDto refreshTokenRequestDto;
     AuthenticationResponseDto authenticationResponseDto;
+    PasswordResetRequestDto passwordResetRequestDto;
+    PasswordResetProcessDto passwordResetProcessDto;
 
     @BeforeEach
     void init() {
         authenticationRequestDto = new AuthenticationRequestDto("Username", "Password");
         refreshTokenRequestDto = new RefreshTokenRequestDto("refreshToken");
         authenticationResponseDto = new AuthenticationResponseDto("accessToken", "refreshToken");
+        passwordResetRequestDto = new PasswordResetRequestDto("test@gmail.com");
+        passwordResetProcessDto = new PasswordResetProcessDto("Test@123", "Test@123", "token");
     }
 
     @Test
@@ -63,7 +69,7 @@ public class AuthenticationControllerUnitTests {
     }
 
     @Test
-    void refreshTokenShouldSucceedWhenRequestBodyValid() throws IOException {
+    void refreshTokenShouldSucceedWhenRequestBodyValid() {
         Mockito.when(authenticationService.refreshToken(any())).thenReturn(authenticationResponseDto);
         ResponseEntity<AuthenticationResponseDto> result = authenticationController.refreshToken(refreshTokenRequestDto, new MapBindingResult(Collections.EMPTY_MAP, "userRegistrationDto"));
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -76,5 +82,53 @@ public class AuthenticationControllerUnitTests {
         bindingResult.addError(new FieldError("fieldError", "token", "Token is required"));
 
         Assertions.assertThrows(FieldValidationException.class, () -> authenticationController.refreshToken(refreshTokenRequestDto, bindingResult));
+    }
+
+    @Test
+    void createResetPasswordRequestShouldSucceed() {
+       Mockito.doNothing().when(authenticationService).createResetPasswordRequest(any());
+        ResponseEntity<Void> result = authenticationController.createResetPasswordRequest(passwordResetRequestDto,
+                new MapBindingResult(Collections.EMPTY_MAP, "userRegistrationDto"));
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    void createResetPasswordRequestShouldFail() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "passwordResetRequest");
+        bindingResult.addError(new FieldError("fieldError", "token", "Email is required"));
+        Assertions.assertThrows(FieldValidationException.class, () -> authenticationController.createResetPasswordRequest(passwordResetRequestDto,
+                bindingResult));
+    }
+
+    @Test
+    void processResetPasswordRequestShouldSucceed() {
+        Mockito.doNothing().when(authenticationService).processResetPasswordRequest(any());
+        ResponseEntity<Void> result = authenticationController.processResetPasswordRequest(passwordResetProcessDto,
+                new MapBindingResult(Collections.EMPTY_MAP, "passwordResetProcessDto"));
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    void processResetPasswordRequestShouldFail() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "passwordResetProcessDto");
+        bindingResult.addError(new FieldError("fieldError", "password", "Invalid password"));
+        Assertions.assertThrows(FieldValidationException.class, () -> authenticationController.processResetPasswordRequest(passwordResetProcessDto,
+                bindingResult));
+    }
+
+    @Test
+    void logoutShouldSucceed() {
+        Mockito.doNothing().when(authenticationService).logout(any());
+        ResponseEntity<Void> result = authenticationController.logout(refreshTokenRequestDto,
+                new MapBindingResult(Collections.EMPTY_MAP, "passwordResetProcessDto"));
+        Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    void logoutShouldFail() {
+        BindingResult bindingResult = new MapBindingResult(new HashMap<>(), "refreshTokenRequestDto");
+        bindingResult.addError(new FieldError("fieldError", "token", "Invalid token"));
+        Assertions.assertThrows(FieldValidationException.class, () -> authenticationController.logout(refreshTokenRequestDto,
+                bindingResult));
     }
 }

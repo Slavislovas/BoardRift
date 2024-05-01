@@ -89,8 +89,8 @@ public class UserController {
     }
 
     @GetMapping("/plays/{playId}")
-    public ResponseEntity<PlayedGameDto> getPlayedGamyByUserIdAndPlayId (@PathVariable("playId") Long playId) throws IllegalAccessException {
-        return ResponseEntity.ok(userService.getPlayedGameByUserIdAndPlayId(playId));
+    public ResponseEntity<PlayedGameDto> getPlayedGameByPlayId(@PathVariable("playId") Long playId) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.getPlayedGameByPlayId(playId));
     }
 
     @GetMapping("/{userId}/statistics")

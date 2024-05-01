@@ -161,7 +161,7 @@ public class PostController {
     }
 
     @DeleteMapping("/posts/{postType}/{postId}/comments/{commentId}")
-    public ResponseEntity<PostCommentDto> deletePostComment(@PathVariable(name = "postType") String postType,
+    public ResponseEntity<Void> deletePostComment(@PathVariable(name = "postType") String postType,
                                                           @PathVariable(name = "postId") Long postId,
                                                           @PathVariable(name = "commentId") Long commentId) throws IllegalAccessException {
         postService.deletePostComment(postType, postId, commentId);

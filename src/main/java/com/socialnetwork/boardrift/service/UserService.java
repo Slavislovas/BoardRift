@@ -416,7 +416,7 @@ public class UserService {
         return new PlayedGamePageDto(nextPageUrl, playedGameDtoList);
     }
 
-    public PlayedGameDto getPlayedGameByUserIdAndPlayId(Long playId) throws IllegalAccessException {
+    public PlayedGameDto getPlayedGameByPlayId(Long playId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
