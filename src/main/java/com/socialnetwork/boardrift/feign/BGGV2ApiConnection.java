@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "bgg-api-v2", url = "https://boardgamegeek.com/xmlapi2/")
 public interface BGGV2ApiConnection {
     @GetMapping("/search")
-    BGGSearchResponse searchForBoardGames(@RequestParam(name="type") String type, @RequestParam(name="query") String query);
+    BGGSearchResponse searchForBoardGames(@RequestParam(name="type") String type,
+                                          @RequestParam(name="query") String query);
 
     @GetMapping("/thing")
     BGGThingResponse getBoardGameById(@RequestParam(name="id") Long id);

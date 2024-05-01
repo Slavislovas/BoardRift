@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -116,7 +115,9 @@ public class ChatMessageService {
             return;
         }
 
-        ChatMessageEntity chatMessage = chatMessageRepository.findById(chatMessageDto.getId()).orElseThrow(() -> new EntityNotFoundException("Chat message with id: " + chatMessageDto.getChatId() + " was not found"));
+        ChatMessageEntity chatMessage = chatMessageRepository
+                .findById(chatMessageDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Chat message with id: " + chatMessageDto.getChatId() + " was not found"));
         chatMessage.setUnread(false);
         chatMessageRepository.save(chatMessage);
     }

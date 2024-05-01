@@ -33,7 +33,8 @@ public class ChatController {
     }
 
     @GetMapping("/{senderId}/{recipientId}")
-    public ResponseEntity<List<ChatMessageDto>> getChatMessages(@PathVariable("senderId") Long senderId, @PathVariable("recipientId") Long recipientId) throws IllegalAccessException {
+    public ResponseEntity<List<ChatMessageDto>> getChatMessages(@PathVariable("senderId") Long senderId,
+                                                                @PathVariable("recipientId") Long recipientId) throws IllegalAccessException {
         return ResponseEntity.ok(chatMessageService.getChatMessages(senderId, recipientId));
     }
 }

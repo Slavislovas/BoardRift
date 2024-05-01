@@ -108,7 +108,9 @@ public class JwtService {
     }
 
     public RefreshTokenEntity saveRefreshToken(UserEntity userEntity) {
-        RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(null, new Date(System.currentTimeMillis() + jwtRefreshTokenLifetimeInMilliseconds), userEntity);
+        RefreshTokenEntity refreshTokenEntity = new RefreshTokenEntity(null,
+                new Date(System.currentTimeMillis() + jwtRefreshTokenLifetimeInMilliseconds),
+                userEntity);
         return refreshTokenRepository.save(refreshTokenEntity);
     }
 

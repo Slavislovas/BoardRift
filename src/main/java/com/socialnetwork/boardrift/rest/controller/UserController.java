@@ -99,7 +99,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserRetrievalDto> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto, BindingResult bindingResult, HttpServletRequest servletRequest) {
+    public ResponseEntity<UserRetrievalDto> createUser(@Valid @RequestBody UserRegistrationDto userRegistrationDto,
+                                                       BindingResult bindingResult,
+                                                       HttpServletRequest servletRequest) {
         RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(userService.createUser(userRegistrationDto, servletRequest), HttpStatus.CREATED);
     }
@@ -123,7 +125,8 @@ public class UserController {
     }
 
     @PostMapping("/plays")
-    public ResponseEntity<PlayedGameDto> logPlayedGame(@Valid @RequestBody PlayedGameDto playedGameDto, BindingResult bindingResult) {
+    public ResponseEntity<PlayedGameDto> logPlayedGame(@Valid @RequestBody PlayedGameDto playedGameDto,
+                                                       BindingResult bindingResult) {
         RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(userService.logPlayedGame(playedGameDto), HttpStatus.CREATED);
     }
@@ -138,7 +141,8 @@ public class UserController {
     @PutMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserRetrievalDto> editUserById(@PathVariable("userId") Long userId,
                                                          @RequestParam(name = "profilePicture", required = false) MultipartFile profilePicture,
-                                                         @Valid @ModelAttribute UserEditDto userEditDto, BindingResult bindingResult) throws IllegalAccessException {
+                                                         @Valid @ModelAttribute UserEditDto userEditDto,
+                                                         BindingResult bindingResult) throws IllegalAccessException {
         RequestValidator.validateRequest(bindingResult);
         return ResponseEntity.ok(userService.editUserById(userId, profilePicture, userEditDto));
     }
@@ -171,13 +175,15 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<Void> removeFromFriendsList(@PathVariable("userId") Long userId, @PathVariable("friendId") Long friendId) throws IllegalAccessException {
+    public ResponseEntity<Void> removeFromFriendsList(@PathVariable("userId") Long userId,
+                                                      @PathVariable("friendId") Long friendId) throws IllegalAccessException {
         userService.removeFromFriendsList(userId, friendId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}/warnings/{warningId}")
-    public ResponseEntity<Void> deleteWarning(@PathVariable("userId") Long userId, @PathVariable("warningId") Long warningId) {
+    public ResponseEntity<Void> deleteWarning(@PathVariable("userId") Long userId,
+                                              @PathVariable("warningId") Long warningId) {
         administratorService.deleteWarning(userId, warningId);
         return ResponseEntity.ok().build();
     }

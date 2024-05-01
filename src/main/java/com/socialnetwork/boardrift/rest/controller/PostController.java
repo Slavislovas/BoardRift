@@ -71,25 +71,29 @@ public class PostController {
     }
 
     @PostMapping("/posts/played-game")
-    public ResponseEntity<PlayedGamePostRetrievalDto> createPlayedGamePost(@Valid @RequestBody PlayedGamePostCreationDto playedGamePostCreationDto, BindingResult bindingResult) {
+    public ResponseEntity<PlayedGamePostRetrievalDto> createPlayedGamePost(@Valid @RequestBody PlayedGamePostCreationDto playedGamePostCreationDto,
+                                                                           BindingResult bindingResult) {
         RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(postService.createPlayedGamePost(playedGamePostCreationDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/posts/simple")
-    public ResponseEntity<SimplePostRetrievalDto> createSimplePost(@Valid @RequestBody SimplePostCreationDto simplePostCreationDto, BindingResult bindingResult) {
+    public ResponseEntity<SimplePostRetrievalDto> createSimplePost(@Valid @RequestBody SimplePostCreationDto simplePostCreationDto,
+                                                                   BindingResult bindingResult) {
         RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(postService.createSimplePost(simplePostCreationDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/posts/poll")
-    public ResponseEntity<PollPostRetrievalDto> createPollPost(@Valid @RequestBody PollPostCreationDto pollPostCreationDto, BindingResult bindingResult) {
+    public ResponseEntity<PollPostRetrievalDto> createPollPost(@Valid @RequestBody PollPostCreationDto pollPostCreationDto,
+                                                               BindingResult bindingResult) {
         RequestValidator.validateRequest(bindingResult);
         return new ResponseEntity<>(postService.createPollPost(pollPostCreationDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/posts/poll/{pollId}/vote/{optionId}")
-    public ResponseEntity<Void> createPollVote(@PathVariable(name = "pollId") Long pollId, @PathVariable(name = "optionId") Long optionId) {
+    public ResponseEntity<Void> createPollVote(@PathVariable(name = "pollId") Long pollId,
+                                               @PathVariable(name = "optionId") Long optionId) {
         postService.createPollVote(pollId, optionId);
         return ResponseEntity.ok().build();
     }

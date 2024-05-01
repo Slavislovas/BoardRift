@@ -9,7 +9,6 @@ import com.socialnetwork.boardrift.repository.PostCommentRepository;
 import com.socialnetwork.boardrift.repository.PostLikeRepository;
 import com.socialnetwork.boardrift.repository.PostReportRepository;
 import com.socialnetwork.boardrift.repository.SimplePostRepository;
-import com.socialnetwork.boardrift.repository.model.NotificationEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;
 import com.socialnetwork.boardrift.repository.model.post.PlayedGamePostEntity;
 import com.socialnetwork.boardrift.repository.model.post.PollOptionEntity;
@@ -110,13 +109,18 @@ public class PostService {
 
         for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
             UserEntity playerUserEntity = userService.getUserEntityById(player.getId());
-            postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(player.getPlayedGameId() != null ? player.getPlayedGameId() : null, playedGamePostCreationDto.getPlayedGameId(),
+            postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(player.getPlayedGameId() != null ?
+                    player.getPlayedGameId() :
+                    null, playedGamePostCreationDto.getPlayedGameId(),
                     boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(),
                     boardGame.getItems().get(0).getBoardGameCategory(), 0, player.getWon(),
                     "no-score", new Date(), false, playerUserEntity, null, new HashSet<>(), new HashSet<>()));
         }
 
-        SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, new ArrayList<>());
+        SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(),
+                new Date(), postCreatorEntity, new ArrayList<>(),
+                new HashSet<>(), null,
+                null, new ArrayList<>());
 
         return new PlayedGamePostEntity(null, 0, 0, 0.0, "no-score", basePost, postCreatorPlayedGameEntity);
     }
@@ -129,16 +133,21 @@ public class PostService {
         PlayedGameEntity postCreatorPlayedGameEntity = new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
                 boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(),
                 boardGame.getItems().get(0).getBoardGameCategory(), playedGamePostCreationDto.getPostCreatorPoints(),
-                playedGamePostCreationDto.getPostCreatorPoints().equals(min), "lowest-score", new Date(), true, postCreatorEntity, null, new HashSet<>(), new HashSet<>());
+                playedGamePostCreationDto.getPostCreatorPoints().equals(min), "lowest-score", new Date(),
+                true, postCreatorEntity, null, new HashSet<>(), new HashSet<>());
 
         for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
             UserEntity playerUserEntity = userService.getUserEntityById(player.getId());
             postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(player.getPlayedGameId() != null ? player.getPlayedGameId() : null, playedGamePostCreationDto.getPlayedGameId(),
                     boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(), boardGame.getItems().get(0).getBoardGameCategory(),
-                    player.getPoints(), player.getPoints().equals(min), "lowest-score", new Date(), false, playerUserEntity, null, new HashSet<>(), new HashSet<>()));
+                    player.getPoints(), player.getPoints().equals(min), "lowest-score", new Date(), false,
+                    playerUserEntity, null, new HashSet<>(), new HashSet<>()));
         }
 
-        SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, new ArrayList<>());
+        SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(),
+                new Date(), postCreatorEntity, new ArrayList<>(),
+                new HashSet<>(), null, null,
+                new ArrayList<>());
 
         return new PlayedGamePostEntity(null, max, min, average, "lowest-score", basePost, postCreatorPlayedGameEntity);
     }
@@ -150,17 +159,24 @@ public class PostService {
 
         PlayedGameEntity postCreatorPlayedGameEntity = new PlayedGameEntity(null, playedGamePostCreationDto.getPlayedGameId(),
                 boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(),
-                boardGame.getItems().get(0).getBoardGameCategory(), playedGamePostCreationDto.getPostCreatorPoints(), playedGamePostCreationDto.getPostCreatorPoints().equals(max),
+                boardGame.getItems().get(0).getBoardGameCategory(), playedGamePostCreationDto.getPostCreatorPoints(),
+                playedGamePostCreationDto.getPostCreatorPoints().equals(max),
                 "highest-score", new Date(), true, postCreatorEntity, null, new HashSet<>(), new HashSet<>());
 
         for (SelectedPlayerDto player : playedGamePostCreationDto.getPlayers()) {
             UserEntity playerUserEntity = userService.getUserEntityById(player.getId());
-            postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(player.getPlayedGameId() != null ? player.getPlayedGameId() : null, playedGamePostCreationDto.getPlayedGameId(),
+            postCreatorPlayedGameEntity.addAssociatedPlay(new PlayedGameEntity(player.getPlayedGameId() != null ?
+                    player.getPlayedGameId() :
+                    null, playedGamePostCreationDto.getPlayedGameId(),
                     boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(), boardGame.getItems().get(0).getBoardGameCategory(),
-                    player.getPoints(), player.getPoints().equals(max), "highest-score", new Date(), false, playerUserEntity, null, new HashSet<>(), new HashSet<>()));
+                    player.getPoints(), player.getPoints().equals(max), "highest-score",
+                    new Date(), false, playerUserEntity,
+                    null, new HashSet<>(), new HashSet<>()));
         }
 
-        SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, new ArrayList<>());
+        SimplePostEntity basePost = new SimplePostEntity(null, playedGamePostCreationDto.getDescription(), new Date(),
+                postCreatorEntity, new ArrayList<>(), new HashSet<>(),
+                null, null, new ArrayList<>());
 
         return new PlayedGamePostEntity(null, max, min, average, "highest-score", basePost, postCreatorPlayedGameEntity);
     }
@@ -210,7 +226,10 @@ public class PostService {
         UserDetails postCreatorDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity postCreatorEntity = userService.getUserEntityByEmail(postCreatorDetails.getUsername());
 
-        SimplePostEntity simplePostEntity = new SimplePostEntity(null, simplePostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, new ArrayList<>());
+        SimplePostEntity simplePostEntity = new SimplePostEntity(null, simplePostCreationDto.getDescription(),
+                new Date(), postCreatorEntity, new ArrayList<>(),
+                new HashSet<>(), null,
+                null, new ArrayList<>());
 
         simplePostEntity = simplePostRepository.save(simplePostEntity);
 
@@ -222,7 +241,11 @@ public class PostService {
         UserEntity postCreatorEntity = userService.getUserEntityByEmail(postCreatorDetails.getUsername());
 
 
-        SimplePostEntity basePost = new SimplePostEntity(null, pollPostCreationDto.getDescription(), new Date(), postCreatorEntity, new ArrayList<>(), new HashSet<>(), null, null, new ArrayList<>());
+        SimplePostEntity basePost = new SimplePostEntity(null, pollPostCreationDto.getDescription(),
+                new Date(), postCreatorEntity,
+                new ArrayList<>(), new HashSet<>(),
+                null, null,
+                new ArrayList<>());
 
         PollPostEntity pollPost = new PollPostEntity(null, new ArrayList<>(), basePost);
 
@@ -243,7 +266,9 @@ public class PostService {
         UserDetails voterUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity voterEntity = userService.getUserEntityByEmail(voterUserDetails.getUsername());
 
-        PollPostEntity pollPost = pollPostRepository.findById(pollId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + pollId + " was not found"));
+        PollPostEntity pollPost = pollPostRepository
+                .findById(pollId)
+                .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + pollId + " was not found"));
 
         if (userAlreadyVoted(pollPost, voterEntity.getId())) {
             throw new DuplicatePollVoteException("User with id: " + voterEntity.getId() + " has already voted on this poll");
@@ -506,21 +531,27 @@ public class PostService {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
 
         return pollPostRepository.findAllByPostCreatorOrFriends(userEntity, pageRequest)
-                .stream().map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(userEntity.getId(), pollPostEntity, false)).toList();
+                .stream()
+                .map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(userEntity.getId(), pollPostEntity, false))
+                .toList();
     }
 
     public List<PlayedGamePostRetrievalDto> retrieveFeedPlayedGamePosts(UserEntity userEntity, Integer page, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
 
         return playedGamePostRepository.findAllByPostCreatorOrFriends(userEntity, pageRequest)
-                .stream().map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(userEntity.getId(), playedGamePostEntity, false)).toList();
+                .stream()
+                .map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(userEntity.getId(), playedGamePostEntity, false))
+                .toList();
     }
 
     public List<SimplePostRetrievalDto> retrieveFeedSimplePosts(UserEntity userEntity, Integer page, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("creationDate").descending());
 
         return simplePostRepository.findAllByPostCreatorOrFriends(userEntity, pageRequest)
-                .stream().map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(userEntity.getId(), simplePostEntity, false)).toList();
+                .stream()
+                .map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(userEntity.getId(), simplePostEntity, false))
+                .toList();
     }
 
     public PostPageDto getPostsByUserId(Long userId, Integer page, Integer pageSize, HttpServletRequest request) throws IllegalAccessException {
@@ -580,21 +611,27 @@ public class PostService {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("creationDate").descending());
 
         return simplePostRepository.findByPostCreatorId(userId, pageRequest)
-                .stream().map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(loggedInUser.getId(), simplePostEntity, false)).toList();
+                .stream()
+                .map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(loggedInUser.getId(), simplePostEntity, false))
+                .toList();
     }
 
     private List<PollPostRetrievalDto> retrievePollPostsByUserId(Long userId, UserEntity loggedInUser, Integer page, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
 
         return pollPostRepository.findByBasePostPostCreatorId(userId, pageRequest)
-                .stream().map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(loggedInUser.getId(), pollPostEntity, false)).toList();
+                .stream()
+                .map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(loggedInUser.getId(), pollPostEntity, false))
+                .toList();
     }
 
     private List<PlayedGamePostRetrievalDto> retrievePlayedGamePostsByUserId(Long userId, UserEntity loggedInUser, Integer page, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by("basePost.creationDate").descending());
 
         return playedGamePostRepository.findByBasePostPostCreatorId(userId, pageRequest)
-                .stream().map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(loggedInUser.getId(), playedGamePostEntity, false)).toList();
+                .stream()
+                .map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(loggedInUser.getId(), playedGamePostEntity, false))
+                .toList();
     }
 
     private PlayedGamePostRetrievalDto mapPlayedGamePostEntityToDtoWithAdditionalFields(Long loggedInUserId, PlayedGamePostEntity playedGamePostEntity, Boolean includeReports) {
@@ -733,7 +770,9 @@ public class PostService {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
 
         return pollPostRepository.findReportedPosts(pageRequest)
-                .stream().map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(userEntity.getId(), pollPostEntity, true)).toList();
+                .stream()
+                .map(pollPostEntity -> mapPollPostEntityToDtoWithAdditionalFields(userEntity.getId(), pollPostEntity, true))
+                .toList();
     }
 
     private List<SimplePostRetrievalDto> retrieveReportedSimplePosts(Integer page, Integer pageSize) {
@@ -743,7 +782,9 @@ public class PostService {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
 
         return simplePostRepository.findReportedPosts(pageRequest)
-                .stream().map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(userEntity.getId(), simplePostEntity, true)).toList();
+                .stream()
+                .map(simplePostEntity -> mapSimplePostEntityToDtoWithAdditionalFields(userEntity.getId(), simplePostEntity, true))
+                .toList();
     }
 
     private List<PlayedGamePostRetrievalDto> retrieveReportedPlayedGamePosts(Integer page, Integer pageSize) {
@@ -753,14 +794,18 @@ public class PostService {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
 
         return playedGamePostRepository.findReportedPosts(pageRequest)
-                .stream().map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(userEntity.getId(), playedGamePostEntity, true)).toList();
+                .stream()
+                .map(playedGamePostEntity -> mapPlayedGamePostEntityToDtoWithAdditionalFields(userEntity.getId(), playedGamePostEntity, true))
+                .toList();
     }
 
     public SimplePostRetrievalDto editSimplePost(Long simplePostId, SimplePostCreationDto simplePostCreationDto) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity userEntity = userService.getUserEntityByEmail(userDetails.getUsername());
 
-        SimplePostEntity simplePostEntity = simplePostRepository.findById(simplePostId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + simplePostId + " was not found"));
+        SimplePostEntity simplePostEntity = simplePostRepository
+                .findById(simplePostId)
+                .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + simplePostId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(userEntity.getRole().name())) {
             if (!simplePostEntity.getPostCreator().getEmail().equals(userEntity.getEmail())) {
@@ -777,7 +822,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        SimplePostEntity simplePostEntity = simplePostRepository.findById(simplePostId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + simplePostId + " was not found"));
+        SimplePostEntity simplePostEntity = simplePostRepository
+                .findById(simplePostId)
+                .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + simplePostId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(role)) {
             if (!simplePostEntity.getPostCreator().getEmail().equals(userDetails.getUsername())) {
@@ -792,7 +839,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity userEntity = userService.getUserEntityByEmail(userDetails.getUsername());
 
-        PollPostEntity pollPostEntity = pollPostRepository.findById(pollPostId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + pollPostId + " was not found"));
+        PollPostEntity pollPostEntity = pollPostRepository
+                .findById(pollPostId)
+                .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + pollPostId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(userEntity.getRole().name())) {
             if (!pollPostEntity.getBasePost().getPostCreator().getEmail().equals(userEntity.getEmail())) {
@@ -820,7 +869,10 @@ public class PostService {
             }
         }
 
-        Set<Long> optionsToDeleteIds = pollPostEntity.getOptions().stream().map(PollOptionEntity::getId).collect(Collectors.toSet()); //remove options that were deleted during editing
+        Set<Long> optionsToDeleteIds = pollPostEntity.getOptions()
+                .stream()
+                .map(PollOptionEntity::getId)
+                .collect(Collectors.toSet()); //remove options that were deleted during editing
         optionsToDeleteIds.removeAll(editedOptionIds);
         pollPostEntity.getOptions().removeIf(option -> option.getId() != null && optionsToDeleteIds.contains(option.getId()));
 
@@ -840,7 +892,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        PollPostEntity pollPostEntity = pollPostRepository.findById(pollPostId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + pollPostId + " was not found"));
+        PollPostEntity pollPostEntity = pollPostRepository
+                .findById(pollPostId)
+                .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + pollPostId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(role)) {
             if (!pollPostEntity.getBasePost().getPostCreator().getEmail().equals(userDetails.getUsername())) {
@@ -855,7 +909,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity userEntity = userService.getUserEntityByEmail(userDetails.getUsername());
 
-        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository.findById(playedGamePostId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + playedGamePostId + "was not found"));
+        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository
+                .findById(playedGamePostId)
+                .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + playedGamePostId + "was not found"));
         Date playedGameCreationDate = playedGamePostEntity.getPlayedGame().getCreationDate();
 
         if (!Role.ROLE_ADMIN.name().equals(userEntity.getRole().name())) {
@@ -885,7 +941,10 @@ public class PostService {
         editedPlayedGamePostEntity.getBasePost().setComments(playedGamePostEntity.getBasePost().getComments());
         editedPlayedGamePostEntity.getBasePost().setReports(playedGamePostEntity.getBasePost().getReports());
 
-        List<Long> currentPlayIds = playedGamePostEntity.getPlayedGame().getAssociatedPlays().stream().map(PlayedGameEntity::getId).collect(toList());
+        List<Long> currentPlayIds = playedGamePostEntity.getPlayedGame().getAssociatedPlays()
+                .stream()
+                .map(PlayedGameEntity::getId)
+                .collect(toList());
         List<Long> editedPlayIds = editedPlayedGamePostEntity.getPlayedGame().getAssociatedPlays().stream().map(PlayedGameEntity::getId).toList();
 
         currentPlayIds.removeAll(editedPlayIds);
@@ -901,7 +960,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository.findById(playedGamePostId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + playedGamePostId + " was not found"));
+        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository
+                .findById(playedGamePostId)
+                .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + playedGamePostId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(role)) {
             if (!playedGamePostEntity.getBasePost().getPostCreator().getEmail().equals(userDetails.getUsername())) {
@@ -939,7 +1000,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        SimplePostEntity simplePost = simplePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
+        SimplePostEntity simplePost = simplePostRepository
+                .findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
 
         PostCommentEntity postCommentEntity = simplePost
                 .getComments()
@@ -963,7 +1026,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"));
+        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository
+                .findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"));
 
         PostCommentEntity postCommentEntity = playedGamePostEntity
                 .getBasePost()
@@ -988,7 +1053,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        PollPostEntity pollPostEntity = pollPostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"));
+        PollPostEntity pollPostEntity = pollPostRepository
+                .findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"));
 
         PostCommentEntity postCommentEntity = pollPostEntity
                 .getBasePost()
@@ -1032,7 +1099,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        SimplePostEntity simplePostEntity = simplePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
+        SimplePostEntity simplePostEntity = simplePostRepository
+                .findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
 
         PostCommentEntity postCommentEntity = simplePostEntity
                 .getComments()
@@ -1056,7 +1125,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"));
+        PlayedGamePostEntity playedGamePostEntity = playedGamePostRepository
+                .findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"));
 
         PostCommentEntity postCommentEntity = playedGamePostEntity
                 .getBasePost()
@@ -1081,7 +1152,9 @@ public class PostService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        PollPostEntity pollPostEntity = pollPostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"));
+        PollPostEntity pollPostEntity = pollPostRepository
+                .findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"));
 
         PostCommentEntity postCommentEntity = pollPostEntity
                 .getBasePost()
@@ -1107,18 +1180,22 @@ public class PostService {
 
         switch (postType) {
             case "simple" -> {
-                simplePostEntity = simplePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
+                simplePostEntity = simplePostRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
             }
 
             case "played-game" -> {
                 simplePostEntity = playedGamePostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 
             case "poll" -> {
                 simplePostEntity = pollPostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 
@@ -1142,18 +1219,22 @@ public class PostService {
 
         switch (postType) {
             case "simple" -> {
-                simplePostEntity = simplePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
+                simplePostEntity = simplePostRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
             }
 
             case "played-game" -> {
                 simplePostEntity = playedGamePostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 
             case "poll" -> {
                 simplePostEntity = pollPostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 
@@ -1198,18 +1279,22 @@ public class PostService {
 
         switch (postType) {
             case "simple" -> {
-                simplePostEntity = simplePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
+                simplePostEntity = simplePostRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
             }
 
             case "played-game" -> {
                 simplePostEntity = playedGamePostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 
             case "poll" -> {
                 simplePostEntity = pollPostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 
@@ -1227,18 +1312,22 @@ public class PostService {
 
         switch (postType) {
             case "simple" -> {
-                simplePostEntity = simplePostRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
+                simplePostEntity = simplePostRepository
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Simple post with id: " + postId + " was not found"));
             }
 
             case "played-game" -> {
                 simplePostEntity = playedGamePostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Played game post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 
             case "poll" -> {
                 simplePostEntity = pollPostRepository
-                        .findById(postId).orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
+                        .findById(postId)
+                        .orElseThrow(() -> new EntityNotFoundException("Poll post with id: " + postId + " was not found"))
                         .getBasePost();
             }
 

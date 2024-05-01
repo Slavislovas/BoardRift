@@ -37,15 +37,14 @@ public class ResetPasswordRequestListener implements ApplicationListener<OnReset
     }
 
     private String buildMessage(UserEntity userEntity, String passwordResetUrl) {
-        StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("Dear ").append(userEntity.getName()).append(" ").append(userEntity.getLastname()).append(",\n\n");
-        stringBuilder.append("Thank you for reaching out to reset your password. To proceed with the password reset process, please click on the following link:\n\n");
-        stringBuilder.append(passwordResetUrl).append("\n\n");
-        stringBuilder.append("If you didn't request this password reset or believe it's an error, please disregard this email.\n\n");
-        stringBuilder.append("Best Regards,\n");
-        stringBuilder.append("Board Rift");
+        String stringBuilder = "Dear " + userEntity.getName() + " " + userEntity.getLastname() + ",\n\n" +
+                "Thank you for reaching out to reset your password. To proceed with the password reset process, please click on the following link:\n\n" +
+                passwordResetUrl + "\n\n" +
+                "If you didn't request this password reset or believe it's an error, please disregard this email.\n\n" +
+                "Best Regards,\n" +
+                "Board Rift";
 
-        return stringBuilder.toString();
+        return stringBuilder;
     }
 }

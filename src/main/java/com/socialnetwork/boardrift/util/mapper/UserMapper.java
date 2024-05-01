@@ -1,7 +1,6 @@
 package com.socialnetwork.boardrift.util.mapper;
 
 import com.socialnetwork.boardrift.repository.model.user.UserEntity;
-import com.socialnetwork.boardrift.rest.model.NotificationDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRegistrationDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalDto;
 import com.socialnetwork.boardrift.rest.model.user.UserRetrievalMinimalDto;

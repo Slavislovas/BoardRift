@@ -39,7 +39,10 @@ public class EmailService {
     }
 
     public VerificationTokenEntity createEmailVerificationToken(UserEntity userEntity) {
-        VerificationTokenEntity emailVerificationTokenEntity = new VerificationTokenEntity(null, VerificationTokenType.EMAIL_VERIFICATION, userEntity, emailVerificationTokenExpiryTimeInMinutes);
+        VerificationTokenEntity emailVerificationTokenEntity = new VerificationTokenEntity(null,
+                VerificationTokenType.EMAIL_VERIFICATION,
+                userEntity,
+                emailVerificationTokenExpiryTimeInMinutes);
         return verificationTokenRepository.save(emailVerificationTokenEntity);
     }
 

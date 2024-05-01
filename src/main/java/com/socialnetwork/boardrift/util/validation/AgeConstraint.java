@@ -1,6 +1,5 @@
 package com.socialnetwork.boardrift.util.validation;
 
-import com.socialnetwork.boardrift.util.validation.AgeValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

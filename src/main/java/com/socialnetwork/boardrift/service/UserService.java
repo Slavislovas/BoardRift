@@ -70,11 +70,15 @@ public class UserService {
     private static final long MAX_PROFILE_PICTURE_SIZE_BYTES = 2 * 1024 * 1024;
 
     public UserEntity getUserEntityById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
     }
 
     public UserEntity getUserEntityByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User with email: " + email + " was not found"));
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User with email: " + email + " was not found"));
     }
 
     public UserRetrievalDto createUser(UserRegistrationDto userRegistrationDto, HttpServletRequest servletRequest) {
@@ -116,8 +120,12 @@ public class UserService {
 
     public FriendRequestDto sendFriendRequest(Long receiverId) throws IllegalAccessException {
         UserDetails senderUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity senderUserEntity = userRepository.findByEmail(senderUserDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with email: " + senderUserDetails.getUsername() + " was not found"));
-        UserEntity receiverUserEntity = userRepository.findById(receiverId).orElseThrow(() -> new EntityNotFoundException("User with id: " + receiverId + " was not found"));
+        UserEntity senderUserEntity = userRepository
+                .findByEmail(senderUserDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with email: " + senderUserDetails.getUsername() + " was not found"));
+        UserEntity receiverUserEntity = userRepository
+                .findById(receiverId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + receiverId + " was not found"));
 
         validateFriendRequest(receiverUserEntity, senderUserEntity);
 
@@ -129,7 +137,8 @@ public class UserService {
                 "/queue/friend-requests/received",
                 userMapper.entityToMinimalRetrievalDto(senderUserEntity));
 
-        return new FriendRequestDto(userMapper.entityToMinimalRetrievalDto(senderUserEntity), userMapper.entityToMinimalRetrievalDto(receiverUserEntity));
+        return new FriendRequestDto(userMapper.entityToMinimalRetrievalDto(senderUserEntity),
+                userMapper.entityToMinimalRetrievalDto(receiverUserEntity));
     }
 
     private void validateFriendRequest(UserEntity receiverUserEntity, UserEntity senderUserEntity) throws IllegalAccessException {
@@ -184,13 +193,17 @@ public class UserService {
 
     public UserRetrievalMinimalDto acceptFriendRequest(Long senderId) {
         UserDetails receiverUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity receiverUserEntity = userRepository.findByEmail(receiverUserDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with email: " + receiverUserDetails.getUsername() + " was not found"));
+        UserEntity receiverUserEntity = userRepository
+                .findByEmail(receiverUserDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with email: " + receiverUserDetails.getUsername() + " was not found"));
 
         if (senderHasNotSentFriendRequest(receiverUserEntity, senderId)) {
             throw new EntityNotFoundException("Friend request from user with id: " + senderId + " not found");
         }
 
-        UserEntity senderUserEntity = userRepository.findById(senderId).orElseThrow(() -> new EntityNotFoundException("Friend request sender with id: " + senderId + " was not found"));
+        UserEntity senderUserEntity = userRepository
+                .findById(senderId)
+                .orElseThrow(() -> new EntityNotFoundException("Friend request sender with id: " + senderId + " was not found"));
         receiverUserEntity.addFriend(senderUserEntity);
         receiverUserEntity.removeReceivedFriendRequest(senderUserEntity);
         userRepository.save(receiverUserEntity);
@@ -213,13 +226,17 @@ public class UserService {
 
     public String declineFriendRequest(Long senderId) {
         UserDetails receiverUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity receiverUserEntity = userRepository.findByEmail(receiverUserDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + receiverUserDetails.getUsername() + " was not found"));
+        UserEntity receiverUserEntity = userRepository
+                .findByEmail(receiverUserDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + receiverUserDetails.getUsername() + " was not found"));
 
         if (senderHasNotSentFriendRequest(receiverUserEntity, senderId)) {
             throw new EntityNotFoundException("Friend request from user with id: " + senderId + " not found");
         }
 
-        UserEntity senderUserEntity = userRepository.findById(senderId).orElseThrow(() -> new EntityNotFoundException("Friend request sender with id: " + senderId + " was not found"));
+        UserEntity senderUserEntity = userRepository
+                .findById(senderId)
+                .orElseThrow(() -> new EntityNotFoundException("Friend request sender with id: " + senderId + " was not found"));
         receiverUserEntity.removeReceivedFriendRequest(senderUserEntity);
         userRepository.save(receiverUserEntity);
 
@@ -235,7 +252,9 @@ public class UserService {
 
     public List<UserRetrievalMinimalDto> getReceivedFriendRequests(Integer pageNumber, Integer pageSize) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity userEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity userEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
         if (pageNumber != null && pageSize != null) {
             int start = pageNumber * pageSize;
@@ -257,7 +276,9 @@ public class UserService {
 
     public Set<UserRetrievalMinimalDto> getSentFriendRequests() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity userEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity userEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
         return userEntity.getSentFriendInvites()
                 .stream()
@@ -267,9 +288,13 @@ public class UserService {
 
     public Set<UserRetrievalMinimalDto> getFriends(Long userId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
-        UserEntity targetUserEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userDetails.getUsername() + " was not found"));
+        UserEntity targetUserEntity = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userDetails.getUsername() + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(loggedInUserEntity.getRole().name())) {
             if (!targetUserEntity.getEmail().equals(userDetails.getUsername())) {
@@ -366,8 +391,12 @@ public class UserService {
 
     public UserRetrievalDto getUserById(Long userId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity userEntity = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
 
         if (!loggedInUserEntity.getRole().equals(Role.ROLE_ADMIN) && !userEntity.isEnabled()) {
             throw new IllegalAccessException("This user has been suspended");
@@ -391,7 +420,9 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+        UserEntity userEntity = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(role)) {
             if (!userEntity.getEmail().equals(userDetails.getUsername())) {
@@ -418,12 +449,20 @@ public class UserService {
 
     public PlayedGameDto getPlayedGameByPlayId(Long playId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
-        PlayedGameEntity playedGameEntity = playedGameRepository.findById(playId).orElseThrow(() -> new EntityNotFoundException("Played game with id " + playId + " was not found"));
+        PlayedGameEntity playedGameEntity = playedGameRepository
+                .findById(playId)
+                .orElseThrow(() -> new EntityNotFoundException("Played game with id " + playId + " was not found"));
 
-        Boolean loggedInUserInAssociatedPlays = playedGameEntity.getAssociatedPlays().stream().anyMatch(play -> play.getUser().getId().equals(loggedInUserEntity.getId()));
-        Boolean loggedInUserInAssociatedWWithPlays = playedGameEntity.getAssociatedWith().stream().anyMatch(play -> play.getUser().getId().equals(loggedInUserEntity.getId()));
+        Boolean loggedInUserInAssociatedPlays = playedGameEntity.getAssociatedPlays()
+                .stream()
+                .anyMatch(play -> play.getUser().getId().equals(loggedInUserEntity.getId()));
+        Boolean loggedInUserInAssociatedWWithPlays = playedGameEntity.getAssociatedWith()
+                .stream()
+                .anyMatch(play -> play.getUser().getId().equals(loggedInUserEntity.getId()));
 
         if (!Role.ROLE_ADMIN.name().equals(loggedInUserEntity.getRole().name())) {
             if (!loggedInUserEntity.getEmail().equals(userDetails.getUsername()) && !loggedInUserInAssociatedPlays && !loggedInUserInAssociatedWWithPlays) {
@@ -438,7 +477,9 @@ public class UserService {
 
     public PlayedGameDto logPlayedGame(PlayedGameDto playedGameDto) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
 
         BGGThingResponse boardGame = boardGameService.getBoardGameById(playedGameDto.getBggGameId());
@@ -464,9 +505,11 @@ public class UserService {
                 playedGameDto.getScoringSystem(), new Date(), true, loggedInUserEntity, null, new HashSet<>(), new HashSet<>());
 
         for (PlayedGameDto associatedPlayedGameDto : playedGameDto.getAssociatedPlays()) {
-            playedGameEntity.addAssociatedPlay(new PlayedGameEntity(associatedPlayedGameDto.getId() != null ? associatedPlayedGameDto.getId() : null, playedGameDto.getBggGameId(), boardGame.getItems().get(0).getNames().get(0).getValue(),
+            playedGameEntity.addAssociatedPlay(new PlayedGameEntity(associatedPlayedGameDto.getId() != null ? associatedPlayedGameDto.getId() : null,
+                    playedGameDto.getBggGameId(), boardGame.getItems().get(0).getNames().get(0).getValue(),
                     boardGame.getItems().get(0).getImage(), boardGame.getItems().get(0).getBoardGameCategory(), associatedPlayedGameDto.getScore(),
-                    associatedPlayedGameDto.getScore().equals(max), playedGameDto.getScoringSystem(), new Date(), false, getUserEntityById(associatedPlayedGameDto.getUser().getId()), null, new HashSet<>(), new HashSet<>()));
+                    associatedPlayedGameDto.getScore().equals(max), playedGameDto.getScoringSystem(), new Date(), false,
+                    getUserEntityById(associatedPlayedGameDto.getUser().getId()), null, new HashSet<>(), new HashSet<>()));
         }
 
         return playedGameRepository.save(playedGameEntity);
@@ -496,7 +539,8 @@ public class UserService {
             playedGameEntity.addAssociatedPlay(new PlayedGameEntity(associatedPlayedGameDto.getId() != null ? associatedPlayedGameDto.getId() : null, playedGameDto.getBggGameId(),
                     boardGame.getItems().get(0).getNames().get(0).getValue(), boardGame.getItems().get(0).getImage(),
                     boardGame.getItems().get(0).getBoardGameCategory(), associatedPlayedGameDto.getScore(), associatedPlayedGameDto.getScore().equals(min),
-                    playedGameDto.getScoringSystem(), new Date(), false, getUserEntityById(associatedPlayedGameDto.getUser().getId()), null, new HashSet<>(), new HashSet<>()));
+                    playedGameDto.getScoringSystem(), new Date(), false, getUserEntityById(associatedPlayedGameDto.getUser().getId()),
+                    null, new HashSet<>(), new HashSet<>()));
         }
 
         return playedGameRepository.save(playedGameEntity);
@@ -549,9 +593,13 @@ public class UserService {
 
     public void deletePlayedGameById(Long playId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
-        PlayedGameEntity playedGameEntity = playedGameRepository.findById(playId).orElseThrow(() -> new EntityNotFoundException("Play with id: " + playId + " was not found"));
+        PlayedGameEntity playedGameEntity = playedGameRepository
+                .findById(playId)
+                .orElseThrow(() -> new EntityNotFoundException("Play with id: " + playId + " was not found"));
 
         if (!playedGameEntity.getUser().getId().equals(loggedInUserEntity.getId())) {
             throw new IllegalAccessException("You cannot delete another players play");
@@ -573,7 +621,9 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+        UserEntity userEntity = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(role)) {
             if (!userEntity.getEmail().equals(userDetails.getUsername())) {
@@ -616,7 +666,9 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+        UserEntity userEntity = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(role)) {
             if (!userEntity.getEmail().equals(userDetails.getUsername())) {
@@ -624,7 +676,9 @@ public class UserService {
             }
         }
 
-        UserEntity friendEntity = userRepository.findById(friendId).orElseThrow(() -> new EntityNotFoundException("Friend with id: " + userId + " was not found"));
+        UserEntity friendEntity = userRepository
+                .findById(friendId)
+                .orElseThrow(() -> new EntityNotFoundException("Friend with id: " + userId + " was not found"));
 
         userEntity.removeFromFriendsList(friendId);
 
@@ -648,7 +702,9 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String role = userDetails.getAuthorities().stream().findFirst().get().getAuthority();
 
-        UserEntity userEntity = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
+        UserEntity userEntity = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id: " + userId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(role)) {
             if (!userEntity.getPublicStatistics()) {
@@ -730,7 +786,8 @@ public class UserService {
         return userStatisticsDto;
     }
 
-    private FriendStatisticsDto findMostPlayedWithFriendForSpecificGame(GameStatisticsDto gameStatisticsDto, Map<Map<Long, UserRetrievalMinimalDto>, Integer> amountOfTimesPlayedSpecificGameWithFriends) {
+    private FriendStatisticsDto findMostPlayedWithFriendForSpecificGame(GameStatisticsDto gameStatisticsDto,
+                                                                        Map<Map<Long, UserRetrievalMinimalDto>, Integer> amountOfTimesPlayedSpecificGameWithFriends) {
         return amountOfTimesPlayedSpecificGameWithFriends.entrySet().stream()
                 .filter(entry -> entry.getKey().containsKey(gameStatisticsDto.getBggGameId()))
                 .max(Comparator.comparingInt(Map.Entry::getValue))
@@ -804,7 +861,9 @@ public class UserService {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserEntity loggedInUserEntity = getUserEntityByEmail(userDetails.getUsername());
 
-        PlayedGameEntity playedGameEntity = playedGameRepository.findById(playId).orElseThrow(() -> new EntityNotFoundException("Play with id: " + playId + " was not found"));
+        PlayedGameEntity playedGameEntity = playedGameRepository
+                .findById(playId)
+                .orElseThrow(() -> new EntityNotFoundException("Play with id: " + playId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(loggedInUserEntity.getRole().name())) {
                 if (!loggedInUserEntity.getEmail().equals(playedGameEntity.getUser().getEmail())) {
@@ -853,9 +912,13 @@ public class UserService {
 
     public PlayedGameDto includePlayInStatistics(Long playId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
-        PlayedGameEntity playedGameEntity = playedGameRepository.findById(playId).orElseThrow(() -> new EntityNotFoundException("Played game with id: " + playId + " was not found"));
+        PlayedGameEntity playedGameEntity = playedGameRepository
+                .findById(playId)
+                .orElseThrow(() -> new EntityNotFoundException("Played game with id: " + playId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(loggedInUserEntity.getRole().name())) {
             if (!loggedInUserEntity.getEmail().equals(playedGameEntity.getUser().getEmail())) {
@@ -870,9 +933,13 @@ public class UserService {
 
     public PlayedGameDto excludePlayFromStatistics(Long playId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
-        PlayedGameEntity playedGameEntity = playedGameRepository.findById(playId).orElseThrow(() -> new EntityNotFoundException("Played game with id: " + playId + " was not found"));
+        PlayedGameEntity playedGameEntity = playedGameRepository
+                .findById(playId)
+                .orElseThrow(() -> new EntityNotFoundException("Played game with id: " + playId + " was not found"));
 
         if (!Role.ROLE_ADMIN.name().equals(loggedInUserEntity.getRole().name())) {
             if (!loggedInUserEntity.getEmail().equals(playedGameEntity.getUser().getEmail())) {

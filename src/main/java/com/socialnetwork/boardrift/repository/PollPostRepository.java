@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -23,6 +22,8 @@ public interface PollPostRepository extends JpaRepository<PollPostEntity, Long> 
 
     List<PollPostEntity> findByBasePostPostCreatorId(Long userId, Pageable pageable);
 
-    @Query("SELECT pp FROM PollPostEntity pp WHERE SIZE(pp.basePost.reports) > 0 ORDER BY SIZE(pp.basePost.reports) DESC")
+    @Query("SELECT pp FROM PollPostEntity pp" +
+            " WHERE SIZE(pp.basePost.reports) > 0 " +
+            "ORDER BY SIZE(pp.basePost.reports) DESC")
     List<PollPostEntity> findReportedPosts(PageRequest pageRequest);
 }

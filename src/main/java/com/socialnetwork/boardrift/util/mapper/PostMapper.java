@@ -65,7 +65,7 @@ public abstract class PostMapper {
                 .getOptions()
                 .stream()
                 .allMatch(pollOptionEntity -> pollOptionEntity.getVotes().isEmpty());
-    };
+    }
 
     @Named("playToPlayedGamePostPlaysRetrievalDto")
     public Set<PlayedGameDto> playToPlayedGamePostPlaysRetrievalDto(PlayedGameEntity playedGame) {

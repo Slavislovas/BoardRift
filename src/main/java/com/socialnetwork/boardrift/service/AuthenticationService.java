@@ -50,18 +50,19 @@ public class AuthenticationService {
                     )
             );
         } catch (DisabledException disabledException) {
-            UserEntity suspendedUserEntity = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new EntityNotFoundException("User with email: " + request.getEmail()  + " was not found"));
+            UserEntity suspendedUserEntity = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new EntityNotFoundException("User with email: " + request.getEmail()  + " was not found"));
 
-            StringBuilder suspensionReasonStringBuilder = new StringBuilder();
-            suspensionReasonStringBuilder.append("This user has been suspended for:\n");
-            suspensionReasonStringBuilder.append(suspendedUserEntity.getSuspension().getReason());
+            String suspensionReasonStringBuilder = "This user has been suspended for:\n" +
+                    suspendedUserEntity.getSuspension().getReason();
 
-            throw new UnauthorizedException(suspensionReasonStringBuilder.toString());
+            throw new UnauthorizedException(suspensionReasonStringBuilder);
         } catch (Exception ex) {
             throw new InvalidLoginCredentialsException();
         }
 
-        UserEntity userEntity = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new EntityNotFoundException("User with email: " + request.getEmail()  + " was not found"));
+        UserEntity userEntity = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException("User with email: " + request.getEmail()  + " was not found"));
 
         if (!userEntity.getEmailVerified()) {
             throw new EmailNotVerifiedException("Please verify your email before logging in");
@@ -101,7 +102,8 @@ public class AuthenticationService {
             return;
         }
 
-        VerificationTokenEntity passwordResetTokenEntity = new VerificationTokenEntity(null, VerificationTokenType.PASSWORD_RESET, userEntity, passwordResetTokenExpiryTimeInMinutes);
+        VerificationTokenEntity passwordResetTokenEntity = new VerificationTokenEntity(null, VerificationTokenType.PASSWORD_RESET,
+                userEntity, passwordResetTokenExpiryTimeInMinutes);
         passwordResetTokenEntity = passwordResetTokenRepository.save(passwordResetTokenEntity);
 
         emailService.sendResetPasswordRequest(userEntity, passwordResetTokenEntity);
@@ -109,7 +111,8 @@ public class AuthenticationService {
 
     public void processResetPasswordRequest(PasswordResetProcessDto passwordResetProcessDto) {
         VerificationTokenEntity passwordResetTokenEntity = passwordResetTokenRepository
-                .findByTokenAndType(passwordResetProcessDto.getToken(), VerificationTokenType.PASSWORD_RESET).orElseThrow(() -> new EntityNotFoundException("Password reset token was not found"));
+                .findByTokenAndType(passwordResetProcessDto.getToken(), VerificationTokenType.PASSWORD_RESET)
+                .orElseThrow(() -> new EntityNotFoundException("Password reset token was not found"));
 
         if (!passwordResetProcessDto.getNewPassword().equals(passwordResetProcessDto.getConfirmationPassword())) {
             throw new FieldValidationException(Map.of("newPassword", "Passwords do not match", "confirmationPassword", "Passwords do not match"));

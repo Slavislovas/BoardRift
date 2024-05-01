@@ -1,7 +1,6 @@
 package com.socialnetwork.boardrift.repository.model.user;
 
 import com.socialnetwork.boardrift.enumeration.Role;
-import com.socialnetwork.boardrift.enumeration.UserStatus;
 import com.socialnetwork.boardrift.repository.model.ChatMessageEntity;
 import com.socialnetwork.boardrift.repository.model.WarningEntity;
 import com.socialnetwork.boardrift.repository.model.board_game.PlayedGameEntity;

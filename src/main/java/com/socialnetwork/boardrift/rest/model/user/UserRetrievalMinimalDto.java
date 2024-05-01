@@ -1,7 +1,6 @@
 package com.socialnetwork.boardrift.rest.model.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.socialnetwork.boardrift.enumeration.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

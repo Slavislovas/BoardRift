@@ -16,5 +16,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     List<UserEntity> findBySuspensionIsNull(Pageable pageable);
 
-    List<UserEntity> findByNameContainingIgnoreCaseOrLastnameContainingIgnoreCase(String name, String name1, Pageable pageable);
+    List<UserEntity> findByNameContainingIgnoreCaseOrLastnameContainingIgnoreCase(String name,
+                                                                                  String name1,
+                                                                                  Pageable pageable);
 }

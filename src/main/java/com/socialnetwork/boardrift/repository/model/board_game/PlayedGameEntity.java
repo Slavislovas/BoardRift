@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -95,9 +94,7 @@ public class PlayedGameEntity {
     }
 
     public void addAssociatedWithPlay(PlayedGameEntity playedGame) {
-        if (!associatedWith.contains(playedGame)) {
-            associatedWith.add(playedGame);
-        }
+        associatedWith.add(playedGame);
     }
 
     @Override

@@ -41,7 +41,8 @@ public class VerificationTokenEntity {
     @JoinColumn(name = "id_user")
     UserEntity user;
 
-    public VerificationTokenEntity(String token, VerificationTokenType type, UserEntity userEntity, int expiryTimeInMinutes){
+    public VerificationTokenEntity(String token, VerificationTokenType type,
+                                   UserEntity userEntity, int expiryTimeInMinutes){
         this.token = token;
         this.type = type;
         this.user = userEntity;

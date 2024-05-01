@@ -36,7 +36,9 @@ public class NotificationService {
 
     public NotificationPageDto getNotifications(Integer page, Integer pageSize, HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
         Pageable pageable = PageRequest.of(page, pageSize,  Sort.by("creationDate").descending());
 
@@ -108,8 +110,12 @@ public class NotificationService {
 
     public Map<String, Object> setNotificationToRead(Long notificationId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
-        NotificationEntity notificationEntity = notificationRepository.findById(notificationId).orElseThrow(() -> new EntityNotFoundException("Notification with id: " + notificationId + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        NotificationEntity notificationEntity = notificationRepository
+                .findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("Notification with id: " + notificationId + " was not found"));
 
         if (!notificationEntity.getRecipient().getId().equals(loggedInUserEntity.getId())) {
             throw new IllegalAccessException("You cannot manipulate another users notifications");
@@ -123,8 +129,12 @@ public class NotificationService {
 
     public void deleteNotification(Long notificationId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
-        NotificationEntity notificationEntity = notificationRepository.findById(notificationId).orElseThrow(() -> new EntityNotFoundException("Notification with id: " + notificationId + " was not found"));
+        UserEntity loggedInUserEntity = userRepository
+                .findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
+        NotificationEntity notificationEntity = notificationRepository
+                .findById(notificationId)
+                .orElseThrow(() -> new EntityNotFoundException("Notification with id: " + notificationId + " was not found"));
 
         if (!notificationEntity.getRecipient().getId().equals(loggedInUserEntity.getId())) {
             throw new IllegalAccessException("You cannot manipulate another users notifications");

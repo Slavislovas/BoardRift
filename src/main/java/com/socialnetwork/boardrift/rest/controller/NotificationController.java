@@ -1,14 +1,10 @@
 package com.socialnetwork.boardrift.rest.controller;
 
-import com.socialnetwork.boardrift.rest.model.NotificationDto;
 import com.socialnetwork.boardrift.rest.model.NotificationPageDto;
 import com.socialnetwork.boardrift.service.NotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
