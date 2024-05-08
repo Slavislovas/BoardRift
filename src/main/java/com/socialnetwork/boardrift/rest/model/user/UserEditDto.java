@@ -17,11 +17,13 @@ public class UserEditDto {
     @NotBlank(message = "Name is required")
     @Pattern(regexp = "^[a-zA-Z ]+$",
             message = "Name can only contain alphabetic characters and spaces")
+    @Size(min = 1, max = 25, message = "A maximum of 25 characters is allowed for name")
     private String name;
 
     @NotBlank(message = "Lastname is required")
     @Pattern(regexp = "^[a-zA-Z ]+$",
             message = "Lastname can only contain alphabetic characters and spaces")
+    @Size(min = 1, max = 25, message = "A maximum of 25 characters is allowed for lastname")
     private String lastname;
 
     @Size(min = 0, max = 500, message = "Bio must be between 0 and 500 characters")
@@ -39,7 +41,9 @@ public class UserEditDto {
     @NotNull(message = "Public statistics privacy setting required")
     private Boolean publicStatistics;
 
+    @Size(min = 1, max = 50)
     private String country;
 
+    @Size(min = 1, max = 50)
     private String city;
 }

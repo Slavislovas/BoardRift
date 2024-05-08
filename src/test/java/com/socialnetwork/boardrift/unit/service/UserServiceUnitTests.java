@@ -69,7 +69,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class})
 public class UserServiceUnitTests {
     @Mock
     AwsService awsService;
@@ -687,7 +687,7 @@ public class UserServiceUnitTests {
         playedGameEntity.setAssociatedWith(Set.of(playedGameEntity2));
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         Mockito.when(authentication.getPrincipal()).thenReturn(userEntity);
-        Mockito.when(userRepository.findByEmail(any())).thenReturn(Optional.of(userEntity));
+        Mockito.lenient().when(userRepository.findByEmail(any())).thenReturn(Optional.of(userEntity));
         Mockito.when(playedGameRepository.findById(any())).thenReturn(Optional.of(playedGameEntity));
         Mockito.when(playedGameRepository.save(any())).thenReturn(playedGameEntity);
         Mockito.doNothing().when(playedGameRepository).delete(any());
@@ -703,7 +703,7 @@ public class UserServiceUnitTests {
         playedGameEntity.setUser(userEntity2);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
         Mockito.when(authentication.getPrincipal()).thenReturn(userEntity);
-        Mockito.when(userRepository.findByEmail(any())).thenReturn(Optional.of(userEntity));
+        Mockito.lenient().when(userRepository.findByEmail(any())).thenReturn(Optional.of(userEntity));
         Mockito.when(playedGameRepository.findById(any())).thenReturn(Optional.of(playedGameEntity));
         assertThrows(IllegalAccessException.class, () -> userService.deletePlayedGameById(1L));
     }

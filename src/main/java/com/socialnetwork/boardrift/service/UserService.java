@@ -465,7 +465,7 @@ public class UserService {
                 .anyMatch(play -> play.getUser().getId().equals(loggedInUserEntity.getId()));
 
         if (!Role.ROLE_ADMIN.name().equals(loggedInUserEntity.getRole().name())) {
-            if (!loggedInUserEntity.getEmail().equals(userDetails.getUsername()) && !loggedInUserInAssociatedPlays && !loggedInUserInAssociatedWWithPlays) {
+            if (!loggedInUserEntity.getEmail().equals(playedGameEntity.getUser().getEmail()) && !loggedInUserInAssociatedPlays && !loggedInUserInAssociatedWWithPlays) {
                 if (!loggedInUserEntity.getPublicPlays()) {
                     throw new IllegalAccessException("You cannot view this user's play");
                 }
@@ -593,15 +593,12 @@ public class UserService {
 
     public void deletePlayedGameById(Long playId) throws IllegalAccessException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserEntity loggedInUserEntity = userRepository
-                .findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("User with username: " + userDetails.getUsername() + " was not found"));
 
         PlayedGameEntity playedGameEntity = playedGameRepository
                 .findById(playId)
                 .orElseThrow(() -> new EntityNotFoundException("Play with id: " + playId + " was not found"));
 
-        if (!playedGameEntity.getUser().getId().equals(loggedInUserEntity.getId())) {
+        if (!playedGameEntity.getUser().getUsername().equals(userDetails.getUsername())) {
             throw new IllegalAccessException("You cannot delete another players play");
         }
 

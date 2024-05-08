@@ -44,7 +44,7 @@ public class UserController {
     @Value("${client.domain}")
     private String clientDomain;
     private final UserService userService;
-    private final ModeratorService administratorService;
+    private final ModeratorService moderatorService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserRetrievalDto> getUserById(@PathVariable(name = "userId") Long userId) throws IllegalAccessException {
@@ -111,7 +111,7 @@ public class UserController {
                                                @Valid @RequestBody WarningDto warningDto,
                                                BindingResult bindingResult) throws IllegalAccessException {
         RequestValidator.validateRequest(bindingResult);
-        return new ResponseEntity<>(administratorService.warnUser(userId, warningDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(moderatorService.warnUser(userId, warningDto), HttpStatus.CREATED);
     }
 
     @PostMapping("/{receiverId}/friend-requests/send")
@@ -134,7 +134,7 @@ public class UserController {
     @PostMapping("/{userId}/suspensions")
     public ResponseEntity<Void> suspendUser(@PathVariable("userId") Long userId,
                                         @RequestBody SuspensionDto suspensionDto) throws IllegalAccessException {
-        administratorService.suspendUser(userId, suspensionDto);
+        moderatorService.suspendUser(userId, suspensionDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -184,13 +184,13 @@ public class UserController {
     @DeleteMapping("/{userId}/warnings/{warningId}")
     public ResponseEntity<Void> deleteWarning(@PathVariable("userId") Long userId,
                                               @PathVariable("warningId") Long warningId) {
-        administratorService.deleteWarning(userId, warningId);
+        moderatorService.deleteWarning(userId, warningId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{userId}/suspensions")
     public ResponseEntity<Void> deleteSuspension(@PathVariable("userId") Long userId) {
-        administratorService.deleteSuspension(userId);
+        moderatorService.deleteSuspension(userId);
         return ResponseEntity.ok().build();
     }
 }

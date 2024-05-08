@@ -76,8 +76,6 @@ public class PostService {
     private final NotificationService notificationService;
     private final BoardGameService boardGameService;
     private final PostMapper postMapper;
-    private final NotificationMapper notificationMapper;
-    private final SimpMessagingTemplate messagingTemplate;
 
     public PlayedGamePostRetrievalDto createPlayedGamePost(PlayedGamePostCreationDto playedGamePostCreationDto) {
         UserDetails postCreatorDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

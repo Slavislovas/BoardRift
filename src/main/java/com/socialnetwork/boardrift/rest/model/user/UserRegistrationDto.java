@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,13 @@ public class UserRegistrationDto {
     @NotBlank(message = "Name is required")
     @Pattern(regexp = "^[a-zA-Z ]+$",
             message = "Name can only contain alphabetic characters and spaces")
+    @Size(min = 1, max = 25, message = "A maximum of 25 characters is allowed for name")
     private String name;
 
     @NotBlank(message = "Lastname is required")
     @Pattern(regexp = "^[a-zA-Z ]+$",
             message = "Lastname can only contain alphabetic characters and spaces")
+    @Size(min = 1, max = 25, message = "A maximum of 25 characters is allowed for lastname")
     private String lastname;
 
     @NotBlank(message = "Email is required")
